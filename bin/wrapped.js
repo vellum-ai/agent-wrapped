@@ -26,6 +26,7 @@ const stats = collect({
   source: flagValue('--source') || 'auto',
   claudeDir: flagValue('--claude-dir') || undefined,
   hermesDir: flagValue('--hermes-dir') || undefined,
+  openclawDir: flagValue('--openclaw-dir') || undefined,
 });
 
 if (args.includes('--json')) {

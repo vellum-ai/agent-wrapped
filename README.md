@@ -35,13 +35,22 @@ node agent-wrapped/bin/wrapped.js --source hermes
 
 Reads `~/.hermes/state.db` (set `--hermes-dir` or `HERMES_HOME` to override). Needs Node 22.5+ or Bun for SQLite support.
 
+**OpenClaw:**
+
+```
+git clone https://github.com/vellum-ai/agent-wrapped
+node agent-wrapped/bin/wrapped.js --source openclaw
+```
+
+Reads `~/.openclaw` session transcripts and MEMORY.md (set `--openclaw-dir` or `OPENCLAW_HOME` to override). Subagent sessions don't count as conversations.
+
 ## What it ships
 
 | Surface | What it does |
 | ------- | ------------ |
 | `wrapped_stats` tool | Model-callable stats collector; optional `write_path` to persist the JSON |
 | `agent-wrapped` skill | Teaches the agent how to generate stats and build the share-card experience |
-| `bin/wrapped.js` CLI | Manual runs: `--json`, `--write`, `--out <path>`, `--source vellum|claude|hermes` |
+| `bin/wrapped.js` CLI | Manual runs: `--json`, `--write`, `--out <path>`, `--source vellum|claude|hermes|openclaw` |
 | `/wrapped` command | Claude Code slash command: generate + present your wrapped |
 
 ## CLI usage

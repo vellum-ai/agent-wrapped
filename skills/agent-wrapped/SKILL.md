@@ -47,7 +47,7 @@ Background and scheduled conversations (`meta.type !== "standard"`) are excluded
 - `--json`: JSON to stdout
 - `--write`: write to `<workspace>/data/apps/agent-wrapped/src/wrapped-data.json`
 - `--out <path>`: write to a custom path
-- `--source vellum|claude|hermes|auto`: pick the data source (default auto-detect)
+- `--source vellum|claude|hermes|openclaw|auto`: pick the data source (default auto-detect)
 - `--claude-dir <path>`: override the Claude Code config dir (default `~/.claude`)
 
 ## Sources
