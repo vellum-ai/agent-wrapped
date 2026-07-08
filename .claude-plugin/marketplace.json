@@ -8,7 +8,7 @@
     {
       "name": "assistant-wrapped",
       "source": "./",
-      "description": "Spotify-Wrapped-style year in review for your AI assistant, computed locally from your Claude Code history."
+      "description": "Your agent's year in review, computed locally from your Claude Code history."
     }
   ]
 }

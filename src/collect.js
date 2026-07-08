@@ -1,6 +1,6 @@
 'use strict';
 /**
- * Assistant Wrapped — stats collector.
+ * Agent Wrapped — stats collector.
  *
  * Multi-source: reads assistant history from a supported source and produces
  * the stats that power the Assistant Wrapped cards. Shared by the `wrapped`
@@ -250,7 +250,7 @@ function collect(opts = {}) {
 
 function formatSummary(stats) {
   const lines = [
-    '── Assistant Wrapped ──',
+    '── Agent Wrapped ──',
     `Source:          ${stats.source}`,
     `Conversations:   ${stats.conversations.toLocaleString()}`,
     `Days together:   ${stats.daysTogether} (since ${stats.firstConversation})`,

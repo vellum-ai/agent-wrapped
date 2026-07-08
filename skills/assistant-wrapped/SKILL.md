@@ -1,28 +1,28 @@
 ---
 name: assistant-wrapped
 description: >-
-  Generate an "Assistant Wrapped" year-in-review from real workspace data:
+  Generate an "Agent Wrapped" year-in-review from real workspace data:
   conversation count, days together, memories formed, swear count, top topics,
   and a derived era. Use when the user asks for their wrapped, a year in
-  review, a usage recap, or wants to build or refresh Spotify-Wrapped-style
-  share cards from their assistant history.
+  review, a usage recap, or wants to build or refresh wrapped
+  share cards from their agent history.
 metadata:
   emoji: "🎁"
   vellum:
-    display-name: "Assistant Wrapped"
+    display-name: "Agent Wrapped"
     category: "fun"
     activation-hints:
-      - "User asks for their assistant wrapped or year in review"
-      - "User wants a recap of how much they've used their assistant"
-      - "User wants Spotify-Wrapped-style share cards from their chat history"
+      - "User asks for their agent wrapped, assistant wrapped, or year in review"
+      - "User wants a recap of how much they've used their agent"
+      - "User wants wrapped-style share cards from their chat history"
       - "User wants to refresh the data behind their wrapped cards app"
     avoid-when:
       - "User wants analytics about cost or model usage (use cost tooling instead)"
 ---
 
-# Assistant Wrapped
+# Agent Wrapped
 
-Turn the assistant's own workspace data into a Spotify-Wrapped-style recap. The plugin ships a collector that scans conversations and memory, plus a CLI and a model tool that expose it.
+Turn the agent's own workspace data into a wrapped-style recap. The plugin ships a collector that scans conversations and memory, plus a CLI and a model tool that expose it.
 
 ## What gets measured
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * wrapped-publish — publish your Assistant Wrapped as a share page.
+ * wrapped-publish — publish your Agent Wrapped as a share page.
  *
  * Forks vellum-ai/assistant-wrapped, commits your stats JSON as
  * pages/<name>.json, and opens a PR. Once the PR is merged, your page is
@@ -173,7 +173,7 @@ function ask(question) {
     head: `${me.login}:${branch}`,
     base: 'main',
     body: [
-      `Publishing **${page.assistant}**'s Assistant Wrapped 🎁`,
+      `Publishing **${page.assistant}**'s Agent Wrapped 🎁`,
       '',
       `- Page: \`${filePath}\` → will be live at ${SITE}/${name}`,
       `- Source: ${stats.source || 'unknown'}`,

@@ -1,7 +1,7 @@
 {
   "name": "@vellum-ai/assistant-wrapped",
-  "version": "0.2.1",
-  "description": "Spotify-Wrapped-style year-in-review stats for your assistant: conversations, days together, memories formed, swear count, top topics, and your era. Works with Vellum assistants and Claude Code. Ships a stats collector tool, a CLI, a Claude Code plugin, and a skill for building the shareable cards experience.",
+  "version": "0.2.2",
+  "description": "Your agent's year in review: conversations, days together, memories formed, swear count, top topics, and your era. Works with Vellum agents and Claude Code. Ships a stats collector tool, a CLI, a Claude Code plugin, and a skill for the shareable cards experience.",
   "license": "MIT",
   "peerDependencies": {
     "@vellumai/plugin-api": "^0.10.0"

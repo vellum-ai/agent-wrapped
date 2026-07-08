@@ -6,7 +6,7 @@ const { collect, formatSummary } = require("../src/collect.js");
 
 export default {
   description:
-    "Generate Assistant Wrapped stats (Spotify-Wrapped-style year in review) by scanning the workspace: total conversations, days together, memories formed, swear count, top topics, and the derived era. Use when the user asks for their wrapped, year in review, usage recap, or to refresh the wrapped cards app data. Optionally writes the stats JSON to a file (e.g. the wrapped cards app's src/wrapped-data.json).",
+    "Generate Agent Wrapped stats (year in review) by scanning the workspace: total conversations, days together, memories formed, swear count, top topics, and the derived era. Use when the user asks for their wrapped, year in review, usage recap, or to refresh the wrapped cards app data. Optionally writes the stats JSON to a file (e.g. the wrapped cards app's src/wrapped-data.json).",
   defaultRiskLevel: "low" as const,
   input_schema: {
     type: "object",
