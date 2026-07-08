@@ -1,0 +1,10 @@
+{
+  "name": "@vellum-ai/assistant-wrapped",
+  "version": "0.1.0",
+  "description": "Spotify-Wrapped-style year-in-review stats for your assistant: conversations, days together, memories formed, swear count, top topics, and your era. Ships a stats collector tool, a CLI, and a skill for building the shareable cards experience.",
+  "license": "MIT",
+  "peerDependencies": {
+    "@vellumai/plugin-api": "^0.10.0"
+  },
+  "vellum": {}
+}
