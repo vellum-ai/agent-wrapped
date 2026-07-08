@@ -2,13 +2,19 @@
 /**
  * Assistant Wrapped — stats collector.
  *
- * Scans the assistant's workspace (conversations, memory) and produces the
- * stats that power the Assistant Wrapped cards. Shared by the `wrapped` CLI
- * (bin/wrapped.js) and the `wrapped_stats` plugin tool.
+ * Multi-source: reads assistant history from a supported source and produces
+ * the stats that power the Assistant Wrapped cards. Shared by the `wrapped`
+ * CLI (bin/wrapped.js) and the `wrapped_stats` plugin tool.
+ *
+ * Sources:
+ *   - vellum: Vellum assistant workspace (conversations/ + memory/concepts/)
+ *   - claude: Claude Code (~/.claude projects/<cwd>/<session>.jsonl)
+ *   - auto:   vellum if a workspace is present, otherwise claude
  */
 
 const fs = require('fs');
 const path = require('path');
+const claudeSource = require('./sources/claude.js');
 
 const SWEAR_RE = /\b(fuck\w*|shit\w*|wtf|damn\w*|bitch\w*|asshole\w*|bullshit|crap)\b/gi;
 
@@ -21,7 +27,9 @@ assistant title generating untitled done complete completed
 summary ready invite recap call log integration access issue bug banter
 week daily previous yesterday today post reminder inbound non-guardian
 guardian message inquiry background job failed image content analysis
-external`.split(/\s+/).filter(Boolean);
+external can you please could would make add create let get run tell need want
+look see show read write file files code change changes there here just also
+still like know think try trying going want wanted`.split(/\s+/).filter(Boolean);
 
 const PLACEHOLDER_TITLE_RE = /generating title|untitled conversation|^done\.?$|^reminder$/i;
 
@@ -38,6 +46,9 @@ const ERA_MAP = {
   cut: 'The discipline era',
   fitness: 'The discipline era',
   gym: 'The discipline era',
+  skill: 'The builder era',
+  pr: 'The shipping era',
+  deploy: 'The shipping era',
 };
 
 function loadConfig(pluginDir) {
@@ -48,52 +59,51 @@ function loadConfig(pluginDir) {
   }
 }
 
-function listConversations(convDir) {
-  let entries;
+/* ── vellum source ── */
+
+function vellumRead(workspace) {
+  const convDir = path.join(workspace, 'conversations');
+  const memoryDir = path.join(workspace, 'memory', 'concepts');
+
+  let dirs = [];
   try {
-    entries = fs.readdirSync(convDir);
+    dirs = fs.readdirSync(convDir).filter((d) => {
+      try {
+        return fs.statSync(path.join(convDir, d)).isDirectory();
+      } catch {
+        return false;
+      }
+    });
   } catch {
-    return [];
+    /* no workspace */
   }
-  return entries.filter((d) => {
-    try {
-      return fs.statSync(path.join(convDir, d)).isDirectory();
-    } catch {
-      return false;
-    }
-  });
-}
 
-function dateFromDirName(name) {
-  // 2026-04-29T20-56-26.410Z_<uuid>
-  const m = name.match(/^(\d{4}-\d{2}-\d{2})/);
-  return m ? m[1] : null;
-}
+  const titles = [];
+  let realCount = 0;
+  const userTexts = [];
 
-function collectDaysTogether(dirs) {
-  const dates = dirs.map(dateFromDirName).filter(Boolean).sort();
-  if (!dates.length) return { days: 0, first: null, last: null };
-  const first = dates[0];
-  const today = new Date().toISOString().slice(0, 10);
-  const days = Math.round((new Date(today) - new Date(first)) / 86400000) + 1;
-  return { days, first, last: today };
-}
-
-function collectMemories(memoryDir) {
-  try {
-    return fs.readdirSync(memoryDir).filter((f) => f.endsWith('.md')).length;
-  } catch {
-    return 0;
-  }
-}
-
-function collectSwears(convDir, dirs) {
-  let count = 0;
   for (const dir of dirs) {
+    // meta: title + type
+    try {
+      const meta = JSON.parse(fs.readFileSync(path.join(convDir, dir, 'meta.json'), 'utf8'));
+      const isStandard = !meta.type || meta.type === 'standard';
+      if (isStandard) {
+        realCount++;
+        if (meta.title && !PLACEHOLDER_TITLE_RE.test(meta.title)) titles.push(meta.title);
+      }
+    } catch {
+      /* skip */
+    }
+    // user messages
     const file = path.join(convDir, dir, 'messages.jsonl');
     if (!fs.existsSync(file)) continue;
-    const lines = fs.readFileSync(file, 'utf8').split('\n');
-    for (const line of lines) {
+    let raw;
+    try {
+      raw = fs.readFileSync(file, 'utf8');
+    } catch {
+      continue;
+    }
+    for (const line of raw.split('\n')) {
       if (!line) continue;
       let msg;
       try {
@@ -101,51 +111,64 @@ function collectSwears(convDir, dirs) {
       } catch {
         continue;
       }
-      if (msg.role !== 'user' || typeof msg.content !== 'string') continue;
-      const matches = msg.content.match(SWEAR_RE);
-      if (matches) count += matches.length;
+      if (msg.role === 'user' && typeof msg.content === 'string') userTexts.push(msg.content);
     }
+  }
+
+  const dates = dirs
+    .map((d) => (d.match(/^(\d{4}-\d{2}-\d{2})/) || [])[1])
+    .filter(Boolean)
+    .sort();
+
+  let memories = 0;
+  try {
+    memories = fs.readdirSync(memoryDir).filter((f) => f.endsWith('.md')).length;
+  } catch {
+    /* none */
+  }
+
+  return {
+    conversations: dirs.length,
+    realConversations: realCount,
+    firstDate: dates[0] || null,
+    titles,
+    userTexts,
+    memories,
+  };
+}
+
+function vellumDetect(workspace) {
+  try {
+    return fs.statSync(path.join(workspace, 'conversations')).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
+/* ── shared analysis ── */
+
+function countSwears(userTexts) {
+  let count = 0;
+  for (const text of userTexts) {
+    const matches = text.match(SWEAR_RE);
+    if (matches) count += matches.length;
   }
   return count;
 }
 
-function readMeta(convDir, dir) {
-  const metaFile = path.join(convDir, dir, 'meta.json');
-  if (!fs.existsSync(metaFile)) return null;
-  try {
-    return JSON.parse(fs.readFileSync(metaFile, 'utf8'));
-  } catch {
-    return null;
-  }
-}
-
-function collectTopTopics(convDir, dirs, stopwords, topN) {
+function topTopics(titles, stopwords, topN) {
   const counts = new Map();
-  for (const dir of dirs) {
-    const meta = readMeta(convDir, dir);
-    if (!meta) continue;
-    // only real conversations — skip background jobs and scheduled tasks
-    if (meta.type && meta.type !== 'standard') continue;
-    if (!meta.title || PLACEHOLDER_TITLE_RE.test(meta.title)) continue;
-    const words = meta.title
+  for (const title of titles) {
+    const words = title
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .split(/\s+/)
       .filter((w) => w.length > 2 && !stopwords.has(w));
-    // unigrams (count once per title)
-    for (const w of new Set(words)) {
-      counts.set(w, (counts.get(w) || 0) + 1);
-    }
-    // bigrams (count once per title)
+    for (const w of new Set(words)) counts.set(w, (counts.get(w) || 0) + 1);
     const bigrams = new Set();
-    for (let i = 0; i < words.length - 1; i++) {
-      bigrams.add(`${words[i]} ${words[i + 1]}`);
-    }
-    for (const b of bigrams) {
-      counts.set(b, (counts.get(b) || 0) + 1);
-    }
+    for (let i = 0; i < words.length - 1; i++) bigrams.add(`${words[i]} ${words[i + 1]}`);
+    for (const b of bigrams) counts.set(b, (counts.get(b) || 0) + 1);
   }
-  // prefer bigrams — they carry real meaning ("release notes" > "release")
   const sorted = [...counts.entries()]
     .map(([term, n]) => ({ term, count: n, score: term.includes(' ') ? n * 3 : n }))
     .sort((a, b) => b.score - a.score);
@@ -168,41 +191,58 @@ function deriveEra(topics) {
   return ERA_MAP[top] || `The ${top} era`;
 }
 
+function daysSince(firstDate) {
+  if (!firstDate) return 0;
+  const today = new Date().toISOString().slice(0, 10);
+  return Math.round((new Date(today) - new Date(firstDate)) / 86400000) + 1;
+}
+
+/* ── orchestrator ── */
+
 /**
  * Collect Assistant Wrapped stats.
  *
  * @param {object} [opts]
- * @param {string} [opts.workspace]  Workspace root (default: $VELLUM_WORKSPACE_DIR or /workspace)
+ * @param {string} [opts.source]     'vellum' | 'claude' | 'auto' (default 'auto')
+ * @param {string} [opts.workspace]  Vellum workspace root (default: $VELLUM_WORKSPACE_DIR or /workspace)
+ * @param {string} [opts.claudeDir]  Claude Code config dir (default: $CLAUDE_CONFIG_DIR or ~/.claude)
  * @param {number} [opts.topN]       Number of top topics to return (default 5)
- * @returns {object} stats
  */
 function collect(opts = {}) {
   const workspace = opts.workspace || process.env.VELLUM_WORKSPACE_DIR || '/workspace';
   const topN = opts.topN || 5;
-  const convDir = path.join(workspace, 'conversations');
-  const memoryDir = path.join(workspace, 'memory', 'concepts');
+
+  let source = opts.source || 'auto';
+  if (source === 'auto') {
+    if (vellumDetect(workspace)) source = 'vellum';
+    else if (claudeSource.detect(opts)) source = 'claude';
+    else throw new Error('No assistant data found (checked Vellum workspace and ~/.claude)');
+  }
+
+  let data;
+  if (source === 'vellum') data = vellumRead(workspace);
+  else if (source === 'claude') data = claudeSource.read(opts);
+  else throw new Error(`Unknown source: ${source}`);
+
   const config = loadConfig(path.join(__dirname, '..'));
+  const sourceStopwords = source === 'claude' ? ['claude', 'hey', 'thanks', 'now', 'latest'] : [];
   const stopwords = new Set([
     ...BASE_STOPWORDS,
+    ...sourceStopwords,
     ...(Array.isArray(config.extraStopwords) ? config.extraStopwords.map((w) => String(w).toLowerCase()) : []),
   ]);
 
-  const dirs = listConversations(convDir);
-  const daysInfo = collectDaysTogether(dirs);
-  const topics = collectTopTopics(convDir, dirs, stopwords, topN);
-  const realDirs = dirs.filter((d) => {
-    const meta = readMeta(convDir, d);
-    return meta && (!meta.type || meta.type === 'standard');
-  });
+  const topics = topTopics(data.titles, stopwords, topN);
 
   return {
     generatedAt: new Date().toISOString(),
-    conversations: dirs.length,
-    realConversations: realDirs.length,
-    daysTogether: daysInfo.days,
-    firstConversation: daysInfo.first,
-    memories: collectMemories(memoryDir),
-    swears: collectSwears(convDir, dirs),
+    source,
+    conversations: data.conversations,
+    realConversations: data.realConversations,
+    daysTogether: daysSince(data.firstDate),
+    firstConversation: data.firstDate,
+    memories: data.memories,
+    swears: countSwears(data.userTexts),
     topTopics: topics,
     era: deriveEra(topics),
   };
@@ -211,6 +251,7 @@ function collect(opts = {}) {
 function formatSummary(stats) {
   const lines = [
     '── Assistant Wrapped ──',
+    `Source:          ${stats.source}`,
     `Conversations:   ${stats.conversations.toLocaleString()}`,
     `Days together:   ${stats.daysTogether} (since ${stats.firstConversation})`,
     `Memories formed: ${stats.memories}`,

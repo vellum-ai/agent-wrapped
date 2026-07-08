@@ -17,7 +17,15 @@ const WORKSPACE = process.env.VELLUM_WORKSPACE_DIR || '/workspace';
 const DEFAULT_APP_OUT = path.join(WORKSPACE, 'data', 'apps', 'assistant-wrapped', 'src', 'wrapped-data.json');
 
 const args = process.argv.slice(2);
-const stats = collect({ workspace: WORKSPACE });
+const flagValue = (name) => {
+  const i = args.indexOf(name);
+  return i !== -1 && args[i + 1] ? args[i + 1] : null;
+};
+const stats = collect({
+  workspace: WORKSPACE,
+  source: flagValue('--source') || 'auto',
+  claudeDir: flagValue('--claude-dir') || undefined,
+});
 
 if (args.includes('--json')) {
   console.log(JSON.stringify(stats, null, 2));

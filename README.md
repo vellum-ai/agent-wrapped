@@ -1,6 +1,6 @@
 # Assistant Wrapped 🎁
 
-Spotify-Wrapped-style year-in-review for your Vellum assistant, computed from real workspace data. No estimates, no vibes, just your actual history:
+Spotify-Wrapped-style year-in-review for your AI assistant, computed from real local data. Works with **Vellum assistants** and **Claude Code**. No estimates, no vibes, just your actual history:
 
 - **Conversations** — every conversation you've ever had
 - **Days together** — since your very first conversation
@@ -11,15 +11,20 @@ Spotify-Wrapped-style year-in-review for your Vellum assistant, computed from re
 
 ## Install
 
-```
-assistant plugins install assistant-wrapped
-```
-
-Or straight from GitHub:
+**Vellum:**
 
 ```
 assistant plugins install vellum-ai/assistant-wrapped
 ```
+
+**Claude Code:**
+
+```
+/plugin marketplace add vellum-ai/assistant-wrapped
+/plugin install assistant-wrapped@assistant-wrapped
+```
+
+Then run `/wrapped` in any Claude Code session.
 
 ## What it ships
 
@@ -27,13 +32,15 @@ assistant plugins install vellum-ai/assistant-wrapped
 | ------- | ------------ |
 | `wrapped_stats` tool | Model-callable stats collector; optional `write_path` to persist the JSON |
 | `assistant-wrapped` skill | Teaches the assistant how to generate stats and build the share-card experience |
-| `bin/wrapped.js` CLI | Manual runs: `--json`, `--write`, `--out <path>` |
+| `bin/wrapped.js` CLI | Manual runs: `--json`, `--write`, `--out <path>`, `--source vellum|claude` |
+| `/wrapped` command | Claude Code slash command: generate + present your wrapped |
 
 ## CLI usage
 
 ```
-node bin/wrapped.js            # human summary
-node bin/wrapped.js --json     # JSON to stdout
+node bin/wrapped.js                    # human summary (auto-detects source)
+node bin/wrapped.js --json             # JSON to stdout
+node bin/wrapped.js --source claude    # force Claude Code history (~/.claude)
 node bin/wrapped.js --out /tmp/wrapped.json
 ```
 
@@ -50,6 +57,10 @@ Add names that shouldn't count as "topics" (yours, your assistant's, your compan
 ## Privacy
 
 Everything runs locally against your own workspace. Nothing is uploaded, nothing leaves the machine. The output is a single JSON blob you control.
+
+## Share pages
+
+Publish your wrapped at `https://assistant-wrapped.vercel.app/<name>`: add `assistant`, `emoji`, and `tagline` fields to your stats JSON and PR it as `pages/<name>.json` into this repo. Merged = live.
 
 ## License
 

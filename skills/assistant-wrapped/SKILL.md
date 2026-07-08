@@ -47,6 +47,13 @@ Background and scheduled conversations (`meta.type !== "standard"`) are excluded
 - `--json`: JSON to stdout
 - `--write`: write to `<workspace>/data/apps/assistant-wrapped/src/wrapped-data.json`
 - `--out <path>`: write to a custom path
+- `--source vellum|claude`: pick the data source (default auto-detect)
+- `--claude-dir <path>`: override the Claude Code config dir (default `~/.claude`)
+
+## Sources
+
+- **vellum** (default when a workspace is present): conversations/ + memory/concepts/
+- **claude**: Claude Code session history at `~/.claude/projects/*/*.jsonl`. Sessions map to conversations, first human prompt per session feeds topic analysis, memories count entries in the global `CLAUDE.md`. The tool accepts a `source` input too.
 
 ## Building the cards experience
 

@@ -20,6 +20,12 @@ export default {
         type: "number",
         description: "Number of top topics to include (default 5).",
       },
+      source: {
+        type: "string",
+        enum: ["auto", "vellum", "claude"],
+        description:
+          "Data source: 'vellum' (workspace conversations), 'claude' (Claude Code ~/.claude history), or 'auto' (default).",
+      },
     },
   },
   async execute(
@@ -28,7 +34,8 @@ export default {
   ): Promise<ToolExecutionResult> {
     try {
       const topN = typeof input.top_n === "number" && input.top_n > 0 ? input.top_n : 5;
-      const stats = collect({ topN });
+      const source = typeof input.source === "string" ? input.source : "auto";
+      const stats = collect({ topN, source });
       let note = "";
       if (typeof input.write_path === "string" && input.write_path.length > 0) {
         const outPath = input.write_path;

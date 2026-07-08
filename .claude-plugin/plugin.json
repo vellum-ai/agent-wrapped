@@ -1,0 +1,13 @@
+{
+  "name": "assistant-wrapped",
+  "description": "Spotify-Wrapped-style year in review for your AI assistant: sessions, days together, swear count, top topics, and your era. Computed locally from your own Claude Code history.",
+  "version": "0.2.0",
+  "author": {
+    "name": "Vellum",
+    "url": "https://github.com/vellum-ai"
+  },
+  "homepage": "https://assistant-wrapped.vercel.app",
+  "repository": "https://github.com/vellum-ai/assistant-wrapped",
+  "license": "MIT",
+  "keywords": ["wrapped", "year-in-review", "stats", "fun"]
+}

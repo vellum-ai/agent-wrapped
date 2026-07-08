@@ -1,0 +1,14 @@
+{
+  "name": "assistant-wrapped",
+  "owner": {
+    "name": "Vellum",
+    "url": "https://github.com/vellum-ai"
+  },
+  "plugins": [
+    {
+      "name": "assistant-wrapped",
+      "source": "./",
+      "description": "Spotify-Wrapped-style year in review for your AI assistant, computed locally from your Claude Code history."
+    }
+  ]
+}
