@@ -14,14 +14,14 @@ Your agent's year in review, computed from real local data. Works with **Vellum 
 **Vellum:**
 
 ```
-assistant plugins install vellum-ai/assistant-wrapped
+assistant plugins install vellum-ai/agent-wrapped
 ```
 
 **Claude Code:**
 
 ```
-/plugin marketplace add vellum-ai/assistant-wrapped
-/plugin install assistant-wrapped@assistant-wrapped
+/plugin marketplace add vellum-ai/agent-wrapped
+/plugin install agent-wrapped@agent-wrapped
 ```
 
 Then run `/wrapped` in any Claude Code session.
@@ -31,7 +31,7 @@ Then run `/wrapped` in any Claude Code session.
 | Surface | What it does |
 | ------- | ------------ |
 | `wrapped_stats` tool | Model-callable stats collector; optional `write_path` to persist the JSON |
-| `assistant-wrapped` skill | Teaches the agent how to generate stats and build the share-card experience |
+| `agent-wrapped` skill | Teaches the agent how to generate stats and build the share-card experience |
 | `bin/wrapped.js` CLI | Manual runs: `--json`, `--write`, `--out <path>`, `--source vellum|claude` |
 | `/wrapped` command | Claude Code slash command: generate + present your wrapped |
 
@@ -60,7 +60,7 @@ Everything runs locally against your own workspace. Nothing is uploaded, nothing
 
 ## Share pages
 
-Publish your wrapped at `https://assistant-wrapped.vercel.app/<name>` with one command:
+Publish your wrapped at `https://agent-wrapped.vercel.app/<name>` with one command:
 
 ```
 node bin/publish.js --name myassistant --assistant "My Assistant" --emoji "🤖" --tagline "chaos, but organized"

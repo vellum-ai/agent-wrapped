@@ -2,9 +2,9 @@
 /**
  * wrapped-publish — publish your Agent Wrapped as a share page.
  *
- * Forks vellum-ai/assistant-wrapped, commits your stats JSON as
+ * Forks vellum-ai/agent-wrapped, commits your stats JSON as
  * pages/<name>.json, and opens a PR. Once the PR is merged, your page is
- * live at https://assistant-wrapped.vercel.app/<name>.
+ * live at https://agent-wrapped.vercel.app/<name>.
  *
  * NOTHING is uploaded without your explicit confirmation. The script shows
  * you exactly what will be published and asks first (or pass --yes).
@@ -24,8 +24,8 @@ const readline = require('readline');
 const { execFileSync } = require('child_process');
 const { collect } = require('../src/collect.js');
 
-const UPSTREAM = 'vellum-ai/assistant-wrapped';
-const SITE = 'https://assistant-wrapped.vercel.app';
+const UPSTREAM = 'vellum-ai/agent-wrapped';
+const SITE = 'https://agent-wrapped.vercel.app';
 
 const args = process.argv.slice(2);
 const flag = (name) => {
@@ -125,7 +125,7 @@ function ask(question) {
   // 5. fork (idempotent; 202 = fork queued)
   console.log(`Forking ${UPSTREAM}…`);
   await gh(token, 'POST', `/repos/${UPSTREAM}/forks`, {});
-  const forkRepo = `${me.login}/assistant-wrapped`;
+  const forkRepo = `${me.login}/agent-wrapped`;
   // wait for the fork to be ready
   for (let i = 0; i < 10; i++) {
     try {
@@ -179,7 +179,7 @@ function ask(question) {
       `- Source: ${stats.source || 'unknown'}`,
       `- Generated: ${stats.generatedAt || 'unknown'}`,
       '',
-      '_Opened with `wrapped-publish` from the assistant-wrapped plugin._',
+      '_Opened with `wrapped-publish` from the agent-wrapped plugin._',
     ].join('\n'),
   });
 

@@ -13,7 +13,7 @@ Then present the results in a fun, punchy way, one stat at a time like reveal ca
 After presenting, offer two follow-ups:
 
 1. **Get the JSON** — rerun with `--json` and save it wherever they want (`--out <path>` works too).
-2. **Publish a share page** — their wrapped can go live at `https://assistant-wrapped.vercel.app/<name>`. IMPORTANT: always ask the user explicitly before publishing anything — this uploads their stats to a public GitHub repo. If (and only if) they say yes, run the bundled publisher, which shows the exact JSON and asks for final confirmation before uploading:
+2. **Publish a share page** — their wrapped can go live at `https://agent-wrapped.vercel.app/<name>`. IMPORTANT: always ask the user explicitly before publishing anything — this uploads their stats to a public GitHub repo. If (and only if) they say yes, run the bundled publisher, which shows the exact JSON and asks for final confirmation before uploading:
 
 ```
 node ${CLAUDE_PLUGIN_ROOT}/bin/publish.js --name <name> --assistant "<Display Name>" --emoji "<emoji>" --tagline "<one-liner>"

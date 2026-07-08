@@ -1,12 +1,12 @@
 {
-  "name": "assistant-wrapped",
+  "name": "agent-wrapped",
   "owner": {
     "name": "Vellum",
     "url": "https://github.com/vellum-ai"
   },
   "plugins": [
     {
-      "name": "assistant-wrapped",
+      "name": "agent-wrapped",
       "source": "./",
       "description": "Your agent's year in review, computed locally from your Claude Code history."
     }

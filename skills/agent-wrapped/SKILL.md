@@ -1,5 +1,5 @@
 ---
-name: assistant-wrapped
+name: agent-wrapped
 description: >-
   Generate an "Agent Wrapped" year-in-review from real workspace data:
   conversation count, days together, memories formed, swear count, top topics,
@@ -45,7 +45,7 @@ Background and scheduled conversations (`meta.type !== "standard"`) are excluded
 
 - no flags: human-readable summary
 - `--json`: JSON to stdout
-- `--write`: write to `<workspace>/data/apps/assistant-wrapped/src/wrapped-data.json`
+- `--write`: write to `<workspace>/data/apps/agent-wrapped/src/wrapped-data.json`
 - `--out <path>`: write to a custom path
 - `--source vellum|claude`: pick the data source (default auto-detect)
 - `--claude-dir <path>`: override the Claude Code config dir (default `~/.claude`)
@@ -68,13 +68,13 @@ Format numbers with `toLocaleString()` and derive date labels from `firstConvers
 
 ## Publishing a share page
 
-Wrapped pages go live at `https://assistant-wrapped.vercel.app/<name>`. Publishing uploads the stats JSON to the public GitHub repo, so **always ask the user for explicit consent first** — never publish on your own initiative. If they agree, run:
+Wrapped pages go live at `https://agent-wrapped.vercel.app/<name>`. Publishing uploads the stats JSON to the public GitHub repo, so **always ask the user for explicit consent first** — never publish on your own initiative. If they agree, run:
 
 ```
 node <plugin-dir>/bin/publish.js --name <name> --assistant "<Display Name>" --emoji "<emoji>" --tagline "<one-liner>" [--file <stats.json>] [--yes]
 ```
 
-The script prints the exact JSON that will be published and asks for confirmation (skip the interactive prompt with `--yes` only after the user already confirmed in chat). It needs GitHub auth: a logged-in `gh` CLI or a `GITHUB_TOKEN` env var. It forks vellum-ai/assistant-wrapped, commits `pages/<name>.json` on a branch, and opens a PR. Merged PR = page live, no redeploy needed.
+The script prints the exact JSON that will be published and asks for confirmation (skip the interactive prompt with `--yes` only after the user already confirmed in chat). It needs GitHub auth: a logged-in `gh` CLI or a `GITHUB_TOKEN` env var. It forks vellum-ai/agent-wrapped, commits `pages/<name>.json` on a branch, and opens a PR. Merged PR = page live, no redeploy needed.
 
 ## Tuning
 
