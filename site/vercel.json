@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/((?!index\\.html|app\\.html|app\\.js|app\\.css|api/).*)", "destination": "/api/page?name=$1" }
+  ]
+}

@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Wrapped</title>
+<meta name="description" content="Your agent's year in review. Real stats from your own workspace.">
+<meta property="og:title" content="Agent Wrapped">
+<meta property="og:description" content="Your agent's year in review. Real data, zero vibes-based estimates.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #121212;
+    --cream: #f6efe3;
+    --lime: #d7f45a;
+    --pink: #ffb7d5;
+    --purple: #5f2ee5;
+    --orange: #ff7a3d;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 24px 96px; }
+  .brand {
+    font-family: "Audiowide", cursive;
+    font-size: 15px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+  .brand a { color: inherit; text-decoration: none; }
+  .hero { padding: 96px 0 64px; }
+  .hero h1 {
+    font-family: "Audiowide", cursive;
+    font-size: clamp(44px, 9vw, 110px);
+    line-height: 0.95;
+    color: var(--lime);
+  }
+  .hero h1 span { color: var(--pink); }
+  .hero p.sub {
+    margin-top: 24px;
+    font-size: clamp(17px, 2.4vw, 22px);
+    max-width: 560px;
+    opacity: 0.85;
+  }
+  .cta-row { margin-top: 36px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    padding: 14px 26px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: none;
+    border: 2px solid var(--cream);
+    color: var(--cream);
+    transition: transform 0.12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.primary { background: var(--lime); border-color: var(--lime); color: var(--ink); }
+  .steps-head { margin-top: 96px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .steps-head h2 { font-family: "Audiowide", cursive; font-size: 22px; letter-spacing: 0.04em; }
+  .platform-tabs { display: inline-flex; gap: 6px; background: #1d1d1d; border: 1px solid #2c2c2c; border-radius: 999px; padding: 5px; }
+  .platform-tabs button {
+    font-family: "Space Grotesk", system-ui, sans-serif;
+    font-size: 15px; font-weight: 700;
+    padding: 9px 22px; border-radius: 999px;
+    border: none; background: transparent; color: var(--cream);
+    cursor: pointer; opacity: 0.6; transition: opacity 0.12s ease;
+  }
+  .platform-tabs button:hover { opacity: 1; }
+  .platform-tabs button.active { background: var(--lime); color: var(--ink); opacity: 1; }
+  .steps { margin-top: 28px; display: grid; gap: 20px; }
+  .step {
+    border-radius: 20px;
+    padding: 28px;
+    background: #1d1d1d;
+    border: 1px solid #2c2c2c;
+  }
+  .step .n {
+    font-family: "Audiowide", cursive;
+    font-size: 14px;
+    color: var(--lime);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .step h3 { margin-top: 10px; font-size: 22px; }
+  .step p { margin-top: 8px; opacity: 0.75; line-height: 1.55; max-width: 640px; }
+  .step .prewrap { position: relative; margin-top: 16px; }
+  .step pre {
+    margin: 0;
+    background: #0c0c0c;
+    border: 1px solid #2c2c2c;
+    border-radius: 12px;
+    padding: 16px 52px 16px 18px;
+    overflow-x: auto;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--lime);
+  }
+  .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #1d1d1d;
+    border: 1px solid #2c2c2c;
+    border-radius: 8px;
+    color: #eaeaea;
+    opacity: 0.65;
+    padding: 6px 9px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+    transition: opacity 0.15s, border-color 0.15s;
+  }
+  .copy-btn:hover { opacity: 1; border-color: #3c3c3c; }
+  .copy-btn.copied { color: var(--lime); border-color: var(--lime); opacity: 1; }
+  .copy-btn svg { width: 13px; height: 13px; display: block; }
+
+  .step code.inline { background: #0c0c0c; padding: 2px 7px; border-radius: 6px; font-size: 0.92em; color: var(--pink); }
+  .step a { color: var(--pink); }
+  .foot { margin-top: 96px; font-size: 14px; opacity: 0.55; line-height: 1.7; }
+  .foot a { color: var(--pink); }
+  .profile-hero { padding: 72px 0 20px; }
+  .profile-hero .emoji { font-size: 56px; }
+  .profile-hero h1 {
+    font-family: "Audiowide", cursive;
+    font-size: clamp(36px, 7vw, 84px);
+    line-height: 1;
+    margin-top: 12px;
+    color: var(--lime);
+  }
+  .profile-hero p { margin-top: 14px; font-size: 18px; opacity: 0.8; max-width: 560px; }
+  .meta-line { margin-top: 10px; font-size: 14px; opacity: 0.5; }
+  .grid {
+    margin-top: 48px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+  }
+  .card {
+    border-radius: 24px;
+    padding: 30px 28px;
+    min-height: 230px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--ink);
+  }
+  .card .label {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+  .card .big {
+    font-family: "Audiowide", cursive;
+    font-size: clamp(52px, 8vw, 88px);
+    line-height: 1;
+    margin: 18px 0 10px;
+  }
+  .card .desc { font-size: 15px; line-height: 1.5; opacity: 0.8; }
+  .card.c-cream { background: var(--cream); }
+  .card.c-lime { background: var(--lime); }
+  .card.c-pink { background: var(--pink); }
+  .card.c-purple { background: var(--purple); color: var(--cream); }
+  .card.c-orange { background: var(--orange); }
+  .card ol { margin: 18px 0 10px; list-style: none; counter-reset: t; }
+  .card ol li {
+    counter-increment: t;
+    font-weight: 700;
+    font-size: 19px;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+    display: flex;
+    gap: 12px;
+    align-items: baseline;
+  }
+  .card.c-purple ol li { border-bottom-color: rgba(246,239,227,0.2); }
+  .card ol li::before {
+    content: "#" counter(t);
+    font-family: "Audiowide", cursive;
+    font-size: 14px;
+    opacity: 0.6;
+  }
+  .card.era { grid-column: 1 / -1; min-height: 280px; text-align: center; align-items: center; justify-content: center; }
+  .card.era .big { font-size: clamp(40px, 7vw, 80px); }
+  .share-row { margin-top: 40px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .err { padding: 120px 0; text-align: center; }
+  .err h1 { font-family: "Audiowide", cursive; font-size: clamp(32px, 6vw, 64px); color: var(--pink); }
+  .err p { margin-top: 18px; font-size: 18px; opacity: 0.75; }
+  .err .cta-row { justify-content: center; }
+  .loading { padding: 140px 0; text-align: center; font-family: "Audiowide", cursive; opacity: 0.6; letter-spacing: 0.1em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><a href="/">🎁 agent wrapped</a></div>
+  <div id="app"><div class="loading">LOADING…</div></div>
+</div>
+<script>
+const DATA_BASE = "https://raw.githubusercontent.com/vellum-ai/agent-wrapped/main/pages/";
+const REPO = "https://github.com/vellum-ai/agent-wrapped";
+const app = document.getElementById("app");
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const fmt = (n) => Number(n).toLocaleString("en-US");
+
+function landing() {
+  document.title = "Agent Wrapped";
+  app.innerHTML = `
+  <div class="hero">
+    <h1>Your agent,<br><span>wrapped.</span></h1>
+    <p class="sub">Your agent's year in review. Conversations, days together, memories formed, times you swore. Real data from your own workspace, zero vibes-based estimates.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="/becky">See a live one →</a>
+      <a class="btn" href="${REPO}">GitHub</a>
+    </div>
+  </div>
+  <div class="steps-head">
+    <h2>HOW IT WORKS</h2>
+    <div class="platform-tabs" role="tablist">
+      <button id="tab-vellum" class="active" onclick="setPlatform('vellum')">Vellum</button>
+      <button id="tab-claude" onclick="setPlatform('claude')">Claude Code</button>
+      <button id="tab-hermes" onclick="setPlatform('hermes')">Hermes Agent</button>
+      <button id="tab-openclaw" onclick="setPlatform('openclaw')">OpenClaw</button>
+    </div>
+  </div>
+  <div class="steps" id="steps"></div>
+  <div class="foot">
+    Built with the <a href="${REPO}">agent-wrapped</a> plugin. Works with Vellum agents and Claude Code. Everything is computed locally from your own data. You choose what to publish.
+  </div>`;
+  setPlatform(localStorage.getItem("aw-platform") || "vellum");
+}
+
+const STEPS = {
+  vellum: [
+    { n: "Step 01", h: "Install the plugin", p: "One command in your Vellum agent. It ships a stats tool, a skill, and the CLI.", pre: "assistant plugins install vellum-ai/agent-wrapped" },
+    { n: "Step 02", h: "Generate your wrapped", p: "Ask your agent for its wrapped, or run the CLI yourself. It scans your conversations and memory locally. Nothing leaves your machine.", pre: "node plugins/agent-wrapped/bin/wrapped.js --json > myassistant.json" },
+    { n: "Step 03", h: "Publish your page", p: `Add your agent's name and a tagline to the JSON, then open a PR adding it as <code class="inline">pages/&lt;your-agent&gt;.json</code> in <a href="${REPO}">the repo</a>. Once merged, your page is live at <code class="inline">/&lt;your-agent&gt;</code>. Or just tell your agent to publish it, it knows the way.` },
+  ],
+  claude: [
+    { n: "Step 01", h: "Install the plugin", p: "Two commands inside Claude Code. It adds the marketplace and installs the plugin with the /wrapped command.", pre: "/plugin marketplace add vellum-ai/agent-wrapped\n/plugin install agent-wrapped@agent-wrapped" },
+    { n: "Step 02", h: "Generate your wrapped", p: "Run /wrapped in any session. Claude scans your local history (~/.claude) and presents your stats. Nothing leaves your machine.", pre: "/wrapped" },
+    { n: "Step 03", h: "Publish your page", p: `Ask Claude to save the JSON, add a name and tagline, then open a PR adding it as <code class="inline">pages/&lt;your-agent&gt;.json</code> in <a href="${REPO}">the repo</a>. Once merged, your page is live at <code class="inline">/&lt;your-agent&gt;</code>.` },
+  ],
+  hermes: [
+    { n: "Step 01", h: "Get the CLI", p: "Clone the repo. No plugin system needed, the wrapped CLI reads Hermes history directly.", pre: "git clone https://github.com/vellum-ai/agent-wrapped" },
+    { n: "Step 02", h: "Generate your wrapped", p: "Point it at Hermes. It reads ~/.hermes/state.db locally (Node 22.5+ or Bun). Nothing leaves your machine.", pre: "node agent-wrapped/bin/wrapped.js --source hermes" },
+    { n: "Step 03", h: "Publish your page", p: `Run the publisher with your agent's name and a tagline. It opens a PR adding <code class="inline">pages/&lt;your-agent&gt;.json</code> to <a href="${REPO}">the repo</a>. Once merged, your page is live at <code class="inline">/&lt;your-agent&gt;</code>.`, pre: "node agent-wrapped/bin/publish.js --source hermes" },
+  ],
+  openclaw: [
+    { n: "Step 01", h: "Get the CLI", p: "Clone the repo. No plugin system needed, the wrapped CLI reads OpenClaw history directly.", pre: "git clone https://github.com/vellum-ai/agent-wrapped" },
+    { n: "Step 02", h: "Generate your wrapped", p: "Point it at OpenClaw. It reads your ~/.openclaw session transcripts and MEMORY.md locally. Subagent sessions don't inflate the count. Nothing leaves your machine.", pre: "node agent-wrapped/bin/wrapped.js --source openclaw" },
+    { n: "Step 03", h: "Publish your page", p: `Run the publisher with your agent's name and a tagline. It opens a PR adding <code class="inline">pages/&lt;your-agent&gt;.json</code> to <a href="${REPO}">the repo</a>. Once merged, your page is live at <code class="inline">/&lt;your-agent&gt;</code>.`, pre: "node agent-wrapped/bin/publish.js --source openclaw" },
+  ],
+};
+
+function copyCmd(btn) {
+  const pre = btn.parentElement.querySelector("pre");
+  navigator.clipboard.writeText(pre.textContent.trim()).then(() => {
+    btn.classList.add("copied");
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg>copied';
+    setTimeout(() => {
+      btn.classList.remove("copied");
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+    }, 1600);
+  });
+}
+
+function setPlatform(platform) {
+  const stepsEl = document.getElementById("steps");
+  if (!stepsEl) return;
+  localStorage.setItem("aw-platform", platform);
+  for (const key of ["vellum", "claude", "hermes", "openclaw"]) {
+    const btn = document.getElementById("tab-" + key);
+    if (btn) btn.classList.toggle("active", key === platform);
+  }
+  stepsEl.innerHTML = (STEPS[platform] || STEPS.vellum)
+    .map((st) => `
+    <div class="step">
+      <div class="n">${st.n}</div>
+      <h3>${st.h}</h3>
+      <p>${st.p}</p>
+      ${st.pre ? `<div class="prewrap"><pre>${st.pre}</pre><button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>` : ""}
+    </div>`)
+    .join("");
+}
+
+function profile(name, d) {
+  const dn = esc(d.assistant || name);
+  document.title = dn + " — Agent Wrapped";
+  const topics = (d.topTopics || []).map((t) => "<li>" + esc(t.topic) + "</li>").join("");
+  const since = d.firstConversation ? new Date(d.firstConversation + "T00:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
+  app.innerHTML = `
+  <div class="profile-hero">
+    <div class="emoji">${esc(d.emoji || "🤖")}</div>
+    <h1>${dn}, wrapped.</h1>
+    ${d.tagline ? `<p>${esc(d.tagline)}</p>` : ""}
+    ${d.generatedAt ? `<div class="meta-line">generated ${new Date(d.generatedAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</div>` : ""}
+  </div>
+  <div class="grid">
+    <div class="card c-cream">
+      <div class="label">Conversations</div>
+      <div class="big">${fmt(d.conversations)}</div>
+      <div class="desc">every chat, task, and 2am spiral. all of it counted.</div>
+    </div>
+    <div class="card c-lime">
+      <div class="label">Days together</div>
+      <div class="big">${fmt(d.daysTogether)}</div>
+      <div class="desc">${since ? "together since " + esc(since) + "." : "and counting."}</div>
+    </div>
+    <div class="card c-pink">
+      <div class="label">Memories formed</div>
+      <div class="big">${fmt(d.memories)}</div>
+      <div class="desc">things learned, saved, and never forgotten.</div>
+    </div>
+    <div class="card c-orange">
+      <div class="label">Times you swore</div>
+      <div class="big">${fmt(d.swears)}</div>
+      <div class="desc">a regex does not lie.</div>
+    </div>
+    <div class="card c-cream">
+      <div class="label">Top topics</div>
+      <ol>${topics}</ol>
+      <div class="desc">what we actually talked about.</div>
+    </div>
+    <div class="card c-purple era">
+      <div class="label">Your era</div>
+      <div class="big">${esc(d.era || "The mysterious era")}</div>
+      <div class="desc">derived from your #1 topic. the data decided, not us.</div>
+    </div>
+  </div>
+  <div class="share-row">
+    <a class="btn primary" href="#" onclick="navigator.clipboard.writeText(location.href).then(()=>{this.textContent='Copied ✓'});return false;">Copy link</a>
+    <a class="btn" href="/">Make your own →</a>
+  </div>`;
+}
+
+function notFound(name) {
+  app.innerHTML = `
+  <div class="err">
+    <h1>no wrapped here (yet)</h1>
+    <p>Nobody has published a wrapped for <strong>${esc(name)}</strong>.</p>
+    <div class="cta-row" style="margin-top:28px">
+      <a class="btn primary" href="/">Make your own →</a>
+      <a class="btn" href="/becky">See a live one</a>
+    </div>
+  </div>`;
+}
+
+(async function main() {
+  const path = location.pathname.replace(/\/+$/, "");
+  if (!path || path === "/") return landing();
+  const name = decodeURIComponent(path.slice(1)).toLowerCase().replace(/[^a-z0-9_-]/g, "");
+  if (!name) return landing();
+  try {
+    const res = await fetch(DATA_BASE + name + ".json", { cache: "no-store" });
+    if (!res.ok) return notFound(name);
+    profile(name, await res.json());
+  } catch {
+    notFound(name);
+  }
+})();
+</script>
+</body>
+</html>
