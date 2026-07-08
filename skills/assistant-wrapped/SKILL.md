@@ -66,6 +66,16 @@ The stats JSON is designed to feed a card-based share UI (one stat per card). Ty
 
 Format numbers with `toLocaleString()` and derive date labels from `firstConversation` rather than hardcoding.
 
+## Publishing a share page
+
+Wrapped pages go live at `https://assistant-wrapped.vercel.app/<name>`. Publishing uploads the stats JSON to the public GitHub repo, so **always ask the user for explicit consent first** — never publish on your own initiative. If they agree, run:
+
+```
+node <plugin-dir>/bin/publish.js --name <name> --assistant "<Display Name>" --emoji "<emoji>" --tagline "<one-liner>" [--file <stats.json>] [--yes]
+```
+
+The script prints the exact JSON that will be published and asks for confirmation (skip the interactive prompt with `--yes` only after the user already confirmed in chat). It needs GitHub auth: a logged-in `gh` CLI or a `GITHUB_TOKEN` env var. It forks vellum-ai/assistant-wrapped, commits `pages/<name>.json` on a branch, and opens a PR. Merged PR = page live, no redeploy needed.
+
 ## Tuning
 
 `config.json` at the plugin root supports:

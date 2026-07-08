@@ -60,7 +60,13 @@ Everything runs locally against your own workspace. Nothing is uploaded, nothing
 
 ## Share pages
 
-Publish your wrapped at `https://assistant-wrapped.vercel.app/<name>`: add `assistant`, `emoji`, and `tagline` fields to your stats JSON and PR it as `pages/<name>.json` into this repo. Merged = live.
+Publish your wrapped at `https://assistant-wrapped.vercel.app/<name>` with one command:
+
+```
+node bin/publish.js --name myassistant --assistant "My Assistant" --emoji "🤖" --tagline "chaos, but organized"
+```
+
+It shows you exactly what will be uploaded and asks before doing anything. Then it forks this repo (using your `gh` login or `GITHUB_TOKEN`), commits `pages/<name>.json`, and opens a PR. Merged = live. Prefer doing it by hand? Just PR the JSON into `pages/` yourself.
 
 ## License
 
