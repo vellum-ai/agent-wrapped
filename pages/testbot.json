@@ -1,0 +1,40 @@
+{
+  "assistant": "TestBot",
+  "emoji": "🧪",
+  "tagline": "end to end test, ignore me",
+  "generatedAt": "2026-07-08T15:57:41.451Z",
+  "conversations": 1546,
+  "realConversations": 396,
+  "daysTogether": 71,
+  "firstConversation": "2026-04-29",
+  "memories": 110,
+  "swears": 16,
+  "topTopics": [
+    {
+      "rank": 1,
+      "topic": "Casual Greeting",
+      "count": 6
+    },
+    {
+      "rank": 2,
+      "topic": "Github Trending",
+      "count": 4
+    },
+    {
+      "rank": 3,
+      "topic": "Cost Optimization",
+      "count": 4
+    },
+    {
+      "rank": 4,
+      "topic": "Slack",
+      "count": 11
+    },
+    {
+      "rank": 5,
+      "topic": "Release",
+      "count": 11
+    }
+  ],
+  "era": "The bestie era"
+}
