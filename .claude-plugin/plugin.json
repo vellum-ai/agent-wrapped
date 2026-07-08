@@ -1,7 +1,7 @@
 {
   "name": "agent-wrapped",
   "description": "Your agent's year in review: sessions, days together, swear count, top topics, and your era. Computed locally from your own Claude Code history.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": {
     "name": "Vellum",
     "url": "https://github.com/vellum-ai"

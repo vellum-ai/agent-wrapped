@@ -9,12 +9,14 @@
  * Sources:
  *   - vellum: Vellum assistant workspace (conversations/ + memory/concepts/)
  *   - claude: Claude Code (~/.claude projects/<cwd>/<session>.jsonl)
- *   - auto:   vellum if a workspace is present, otherwise claude
+ *   - hermes: Hermes Agent (~/.hermes/state.db SQLite)
+ *   - auto:   first of vellum, claude, hermes with data present
  */
 
 const fs = require('fs');
 const path = require('path');
 const claudeSource = require('./sources/claude.js');
+const hermesSource = require('./sources/hermes.js');
 
 const SWEAR_RE = /\b(fuck\w*|shit\w*|wtf|damn\w*|bitch\w*|asshole\w*|bullshit|crap)\b/gi;
 
@@ -203,9 +205,10 @@ function daysSince(firstDate) {
  * Collect Assistant Wrapped stats.
  *
  * @param {object} [opts]
- * @param {string} [opts.source]     'vellum' | 'claude' | 'auto' (default 'auto')
+ * @param {string} [opts.source]     'vellum' | 'claude' | 'hermes' | 'auto' (default 'auto')
  * @param {string} [opts.workspace]  Vellum workspace root (default: $VELLUM_WORKSPACE_DIR or /workspace)
  * @param {string} [opts.claudeDir]  Claude Code config dir (default: $CLAUDE_CONFIG_DIR or ~/.claude)
+ * @param {string} [opts.hermesDir]  Hermes home dir (default: $HERMES_HOME or ~/.hermes)
  * @param {number} [opts.topN]       Number of top topics to return (default 5)
  */
 function collect(opts = {}) {
@@ -216,16 +219,22 @@ function collect(opts = {}) {
   if (source === 'auto') {
     if (vellumDetect(workspace)) source = 'vellum';
     else if (claudeSource.detect(opts)) source = 'claude';
-    else throw new Error('No assistant data found (checked Vellum workspace and ~/.claude)');
+    else if (hermesSource.detect(opts)) source = 'hermes';
+    else throw new Error('No agent data found (checked Vellum workspace, ~/.claude, and ~/.hermes)');
   }
 
   let data;
   if (source === 'vellum') data = vellumRead(workspace);
   else if (source === 'claude') data = claudeSource.read(opts);
+  else if (source === 'hermes') data = hermesSource.read(opts);
   else throw new Error(`Unknown source: ${source}`);
 
   const config = loadConfig(path.join(__dirname, '..'));
-  const sourceStopwords = source === 'claude' ? ['claude', 'hey', 'thanks', 'now', 'latest'] : [];
+  const SOURCE_STOPWORDS = {
+    claude: ['claude', 'hey', 'thanks', 'now', 'latest'],
+    hermes: ['hermes', 'hey', 'thanks', 'now', 'latest'],
+  };
+  const sourceStopwords = SOURCE_STOPWORDS[source] || [];
   const stopwords = new Set([
     ...BASE_STOPWORDS,
     ...sourceStopwords,

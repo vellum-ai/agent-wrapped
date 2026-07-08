@@ -22,9 +22,9 @@ export default {
       },
       source: {
         type: "string",
-        enum: ["auto", "vellum", "claude"],
+        enum: ["auto", "vellum", "claude", "hermes"],
         description:
-          "Data source: 'vellum' (workspace conversations), 'claude' (Claude Code ~/.claude history), or 'auto' (default).",
+          "Data source: 'vellum' (workspace conversations), 'claude' (Claude Code ~/.claude history), 'hermes' (Hermes Agent ~/.hermes/state.db), or 'auto' (default).",
       },
     },
   },

@@ -25,6 +25,7 @@ const stats = collect({
   workspace: WORKSPACE,
   source: flagValue('--source') || 'auto',
   claudeDir: flagValue('--claude-dir') || undefined,
+  hermesDir: flagValue('--hermes-dir') || undefined,
 });
 
 if (args.includes('--json')) {
