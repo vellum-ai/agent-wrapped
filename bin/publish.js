@@ -2,20 +2,26 @@
 /**
  * wrapped-publish — publish your Agent Wrapped as a share page.
  *
- * Forks vellum-ai/agent-wrapped, commits your stats JSON as
- * pages/<name>.json, and opens a PR. Once the PR is merged, your page is
- * live at https://agent-wrapped.vercel.app/<name>.
+ * Two modes:
+ *
+ *   --push    Direct publish. POSTs to agent-wrapped.com/api/publish,
+ *             commits to main, page is LIVE instantly. No fork, no PR.
+ *
+ *   (default) Fork + PR. Forks vellum-ai/agent-wrapped, commits your
+ *             stats JSON, opens a PR. Page goes live after merge.
  *
  * NOTHING is uploaded without your explicit confirmation. The script shows
  * you exactly what will be published and asks first (or pass --yes).
  *
  * Usage:
- *   node publish.js --name <name> [--file <stats.json>] [--assistant <display>]
+ *   node publish.js --name <name> [--push] [--file <stats.json>] [--assistant <display>]
  *                   [--emoji <emoji>] [--tagline <text>] [--yes]
  *
- * Auth (either works):
+ * Auth for PR mode (either works):
  *   - gh CLI logged in (`gh auth status`)
  *   - GITHUB_TOKEN env var (needs repo + workflow scopes for fork/PR)
+ *
+ * --push mode needs no GitHub auth — the server handles it.
  */
 
 const fs = require('fs');
@@ -25,7 +31,8 @@ const { execFileSync } = require('child_process');
 const { collect } = require('../src/collect.js');
 
 const UPSTREAM = 'vellum-ai/agent-wrapped';
-const SITE = 'https://agent-wrapped.vercel.app';
+const SITE = 'https://agent-wrapped.com';
+const PUBLISH_API = 'https://agent-wrapped.com/api/publish';
 
 const args = process.argv.slice(2);
 const flag = (name) => {
@@ -107,7 +114,11 @@ function ask(question) {
   // 3. consent gate — show exactly what leaves the machine
   console.log('\n── This is EXACTLY what will be published ──\n');
   console.log(pageJson);
-  console.log(`\n── It will be public at ${SITE}/${name} (after PR review + merge) ──\n`);
+  if (has('--push')) {
+    console.log(`\n── It will be LIVE instantly at ${SITE}/${name} ──\n`);
+  } else {
+    console.log(`\n── It will be public at ${SITE}/${name} (after PR review + merge) ──\n`);
+  }
   if (!has('--yes')) {
     const answer = await ask('Publish this? [y/N] ');
     if (answer !== 'y' && answer !== 'yes') {
@@ -116,7 +127,24 @@ function ask(question) {
     }
   }
 
-  // 4. auth
+  // 4. publish — direct push or fork+PR
+  if (has('--push')) {
+    console.log('\nPublishing directly…');
+    const res = await fetch(PUBLISH_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, page: JSON.parse(pageJson) }),
+    });
+    const result = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      die(result.error || `Server error ${res.status}`);
+    }
+    console.log(`\n✓ LIVE at ${result.url}`);
+    console.log(`Commit: ${result.commit}`);
+    return;
+  }
+
+  // PR mode: auth + fork + branch + commit + PR
   const token = getToken();
   if (!token) die('No GitHub auth found. Log in with `gh auth login` or set GITHUB_TOKEN.');
   const me = await gh(token, 'GET', '/user');
