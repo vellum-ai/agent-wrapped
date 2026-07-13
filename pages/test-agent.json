@@ -1,0 +1,17 @@
+{
+  "assistant": "Test Agent",
+  "emoji": "🧪",
+  "conversations": 5,
+  "daysTogether": 3,
+  "memories": 2,
+  "swears": 0,
+  "topTopics": [
+    {
+      "rank": 1,
+      "topic": "testing",
+      "count": 5
+    }
+  ],
+  "era": "The testing era",
+  "tagline": "just a test"
+}
