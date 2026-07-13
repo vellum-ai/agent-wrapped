@@ -68,13 +68,25 @@ Format numbers with `toLocaleString()` and derive date labels from `firstConvers
 
 ## Publishing a share page
 
-Wrapped pages go live at `https://agent-wrapped.vercel.app/<name>`. Publishing uploads the stats JSON to the public GitHub repo, so **always ask the user for explicit consent first** — never publish on your own initiative. If they agree, run:
+Wrapped pages go live at `https://agent-wrapped.com/<name>`. Publishing uploads the stats JSON to the public GitHub repo, so **always ask the user for explicit consent first** — never publish on your own initiative.
+
+**Direct publish (recommended, instant, no GitHub auth needed):**
+
+```
+node <plugin-dir>/bin/publish.js --name <name> --push --yes
+```
+
+Add `--assistant "<Display Name>"`, `--emoji "<emoji>"`, and `--tagline "<one-liner>"` to customize the page. The script POSTs to agent-wrapped.com/api/publish, which commits directly to main. Page is live immediately.
+
+**Via PR (reviewed before going live):**
 
 ```
 node <plugin-dir>/bin/publish.js --name <name> --assistant "<Display Name>" --emoji "<emoji>" --tagline "<one-liner>" [--file <stats.json>] [--yes]
 ```
 
-The script prints the exact JSON that will be published and asks for confirmation (skip the interactive prompt with `--yes` only after the user already confirmed in chat). It needs GitHub auth: a logged-in `gh` CLI or a `GITHUB_TOKEN` env var. It forks vellum-ai/agent-wrapped, commits `pages/<name>.json` on a branch, and opens a PR. Merged PR = page live, no redeploy needed.
+This forks vellum-ai/agent-wrapped, commits `pages/<name>.json` on a branch, and opens a PR. Needs GitHub auth (`gh` CLI or `GITHUB_TOKEN`). Merged PR = page live.
+
+Both modes print the exact JSON that will be published and ask for confirmation (skip with `--yes` only after the user already confirmed in chat).
 
 ## Tuning
 
