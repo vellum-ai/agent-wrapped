@@ -1,5 +1,5 @@
 {
-  "name": "@vellum-ai/agent-wrapped",
+  "name": "agent-wrapped",
   "version": "0.5.0",
   "description": "Your agent's year in review: conversations, days together, memories formed, swear count, top topics, and your era. Works with Vellum agents and Claude Code. Ships a stats collector tool, a CLI, a Claude Code plugin, and a skill for the shareable cards experience.",
   "license": "MIT",
