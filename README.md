@@ -78,13 +78,23 @@ Everything runs locally against your own workspace. Nothing is uploaded, nothing
 
 ## Share pages
 
-Publish your wrapped at `https://agent-wrapped.vercel.app/<name>` with one command:
+Publish your wrapped at `https://agent-wrapped.com/<name>` — two ways:
+
+**Direct (instant, no GitHub needed):**
+
+```
+node bin/publish.js --name myassistant --push --yes
+```
+
+Or paste your JSON into the form at [agent-wrapped.com](https://agent-wrapped.com).
+
+**Via PR (reviewed before going live):**
 
 ```
 node bin/publish.js --name myassistant --assistant "My Assistant" --emoji "🤖" --tagline "chaos, but organized"
 ```
 
-It shows you exactly what will be uploaded and asks before doing anything. Then it forks this repo (using your `gh` login or `GITHUB_TOKEN`), commits `pages/<name>.json`, and opens a PR. Merged = live. Prefer doing it by hand? Just PR the JSON into `pages/` yourself.
+This forks the repo, commits `pages/<name>.json`, and opens a PR. Merged = live.
 
 ## License
 
