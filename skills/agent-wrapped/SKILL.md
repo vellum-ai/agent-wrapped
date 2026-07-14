@@ -70,6 +70,8 @@ Format numbers with `toLocaleString()` and derive date labels from `firstConvers
 
 Wrapped pages go live at `https://agent-wrapped.com/<name>`. Publishing uploads the stats JSON to the public GitHub repo, so **always ask the user for explicit consent first** — never publish on your own initiative.
 
+**Choosing the page slug (`--name`):** Use the **assistant's name**, not the user's name. This is the assistant's wrapped, so the URL should reflect who the assistant is. For example, if the assistant is named Ziggy and the user is Marina, use `--name ziggy`, not `--name marina`. If the slug is already taken, the server auto-increments (e.g. `ziggy-1`, `ziggy-2`) and returns the actual URL.
+
 **Direct publish (recommended, instant, no GitHub auth needed):**
 
 ```
