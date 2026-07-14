@@ -1,27 +1,33 @@
 #!/usr/bin/env node
 /**
- * wrapped-publish — publish your Agent Wrapped as a share page.
+ * wrapped-publish — publish or delete your Agent Wrapped share page.
  *
- * Two modes:
+ * Three modes:
  *
  *   --push    Direct publish. POSTs to agent-wrapped.com/api/publish,
  *             commits to main, page is LIVE instantly. No fork, no PR.
  *
+ *   --delete  Direct delete. POSTs to agent-wrapped.com/api/delete,
+ *             removes the page from the repo. Page is gone instantly.
+ *             Works with --push (uses the API) or without (fork + PR to
+ *             delete the file).
+ *
  *   (default) Fork + PR. Forks vellum-ai/agent-wrapped, commits your
  *             stats JSON, opens a PR. Page goes live after merge.
  *
- * NOTHING is uploaded without your explicit confirmation. The script shows
- * you exactly what will be published and asks first (or pass --yes).
+ * NOTHING is uploaded or deleted without your explicit confirmation.
  *
  * Usage:
  *   node publish.js --name <name> [--push] [--file <stats.json>] [--assistant <display>]
  *                   [--emoji <emoji>] [--tagline <text>] [--yes]
+ *   node publish.js --name <name> --delete --push [--yes]
+ *   node publish.js --name <name> --delete [--yes]
  *
  * Auth for PR mode (either works):
  *   - gh CLI logged in (`gh auth status`)
  *   - GITHUB_TOKEN env var (needs repo + workflow scopes for fork/PR)
  *
- * --push mode needs no GitHub auth — the server handles it.
+ * --push and --delete --push need no GitHub auth — the server handles it.
  */
 
 const fs = require('fs');
@@ -33,6 +39,7 @@ const { collect } = require('../src/collect.js');
 const UPSTREAM = 'vellum-ai/agent-wrapped';
 const SITE = 'https://agent-wrapped.com';
 const PUBLISH_API = 'https://agent-wrapped.com/api/publish';
+const DELETE_API = 'https://agent-wrapped.com/api/delete';
 
 const args = process.argv.slice(2);
 const flag = (name) => {
@@ -87,7 +94,89 @@ function ask(question) {
   const name = (flag('--name') || '').toLowerCase().replace(/[^a-z0-9_-]/g, '');
   if (!name) die('Missing --name <name>. This becomes your URL: ' + SITE + '/<name>');
 
-  // 1. load or generate stats
+  // ── delete mode ──
+  if (has('--delete')) {
+    console.log(`\n── Delete page: ${SITE}/${name} ──`);
+    if (!has('--yes')) {
+      const answer = await ask(`Delete this page permanently? [y/N] `);
+      if (answer !== 'y' && answer !== 'yes') {
+        console.log('Aborted. Nothing was deleted.');
+        process.exit(0);
+      }
+    }
+
+    if (has('--push')) {
+      console.log('\nDeleting via API…');
+      const res = await fetch(DELETE_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      const result = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        die(result.error || `Server error ${res.status}`);
+      }
+      console.log(`\n✓ Deleted. ${SITE}/${name} is gone.`);
+      return;
+    }
+
+    // PR mode: fork + delete file + PR
+    const token = getToken();
+    if (!token) die('No GitHub auth found. Log in with `gh auth login` or set GITHUB_TOKEN, or use --push to delete via the API.');
+    const me = await gh(token, 'GET', '/user');
+    console.log(`\nAuthenticated as ${me.login}`);
+
+    console.log(`Forking ${UPSTREAM}…`);
+    await gh(token, 'POST', `/repos/${UPSTREAM}/forks`, {});
+    const forkRepo = `${me.login}/agent-wrapped`;
+    for (let i = 0; i < 10; i++) {
+      try {
+        await gh(token, 'GET', `/repos/${forkRepo}`);
+        break;
+      } catch {
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+    }
+
+    try {
+      await gh(token, 'POST', `/repos/${forkRepo}/merge-upstream`, { branch: 'main' });
+    } catch { /* fresh forks are already in sync */ }
+
+    const mainRef = await gh(token, 'GET', `/repos/${forkRepo}/git/ref/heads/main`);
+    const branch = `wrapped/delete-${name}-${Date.now().toString(36)}`;
+    await gh(token, 'POST', `/repos/${forkRepo}/git/refs`, {
+      ref: `refs/heads/${branch}`,
+      sha: mainRef.object.sha,
+    });
+
+    const filePath = `pages/${name}.json`;
+    let fileSha;
+    try {
+      const existing = await gh(token, 'GET', `/repos/${forkRepo}/contents/${filePath}?ref=${branch}`);
+      fileSha = existing.sha;
+    } catch {
+      die(`No page found for "${name}". Nothing to delete.`);
+    }
+
+    await gh(token, 'DELETE', `/repos/${forkRepo}/contents/${encodeURI(filePath)}`, {
+      message: `pages: delete ${name}'s wrapped`,
+      sha: fileSha,
+      branch,
+    });
+
+    const pr = await gh(token, 'POST', `/repos/${UPSTREAM}/pulls`, {
+      title: `pages: delete ${name}'s wrapped`,
+      head: `${me.login}:${branch}`,
+      base: 'main',
+      body: `Deleting **${name}**'s Agent Wrapped page.\n\n_File: \`${filePath}\`_\n\n_Opened with \`wrapped-publish --delete\`._`,
+    });
+
+    console.log(`\n✓ PR opened: ${pr.html_url}`);
+    console.log(`Once merged, ${SITE}/${name} will be gone.`);
+    return;
+  }
+
+  // ── publish mode ──
   let stats;
   const file = flag('--file');
   if (file) {
