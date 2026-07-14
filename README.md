@@ -114,6 +114,14 @@ node bin/publish.js --name myassistant --assistant "My Assistant" --emoji "🤖"
 
 This forks the repo, commits `pages/<name>.json`, and opens a PR. Merged = live.
 
+**Deleting your page:**
+
+```
+node bin/publish.js --name myassistant --delete --push --yes
+```
+
+Removes the page immediately. Or drop `--push` to open a PR instead.
+
 ## License
 
 MIT
