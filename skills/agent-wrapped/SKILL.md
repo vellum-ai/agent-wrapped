@@ -3,9 +3,9 @@ name: agent-wrapped
 description: >-
   Generate an "Agent Wrapped" year-in-review from real workspace data:
   conversation count, days together, memories formed, swear count, top topics,
-  and a derived era. Use when the user asks for their wrapped, a year in
-  review, a usage recap, or wants to build or refresh wrapped
-  share cards from their agent history.
+  and the receipt (total tokens + LLM calls). Use when the user asks for
+  their wrapped, a year in review, a usage recap, or wants to build or
+  refresh wrapped share cards from their agent history.
 metadata:
   emoji: "🎁"
   vellum:
@@ -33,7 +33,7 @@ Turn the agent's own workspace data into a wrapped-style recap. The plugin ships
 | Memories formed | `.md` files under `<workspace>/memory/concepts/`                                |
 | Times sworn     | Regex over user messages in every `messages.jsonl`                              |
 | Top topics      | Bigram-weighted frequency analysis of conversation titles (standard convos only) |
-| Era             | Derived from the #1 topic via a fun mapping ("release" → "The shipping era")    |
+| Receipt         | Total tokens + LLM calls from usage data (vellum: `assistant usage totals`; claude: JSONL token sums; hermes: state.db; openclaw: transcript lines) |
 
 Background and scheduled conversations (`meta.type !== "standard"`) are excluded from topic analysis so cron noise never becomes a "top topic."
 
@@ -61,7 +61,7 @@ The stats JSON is designed to feed a card-based share UI (one stat per card). Ty
 
 1. Run `wrapped_stats` with `write_path` pointing at the app's `src/wrapped-data.json`.
 2. In the app, import the JSON directly (`import data from "./wrapped-data.json"`); esbuild handles JSON imports.
-3. Map stats to cards: conversations, days together (show `firstConversation` as "since" label), memories, swears, top topics list, era as the finale card.
+3. Map stats to cards: conversations, days together (show `firstConversation` as "since" label), memories, swears, top topics list, the receipt as the finale card (total tokens + LLM calls).
 4. Rebuild/refresh the app so the new numbers render.
 
 Format numbers with `toLocaleString()` and derive date labels from `firstConversation` rather than hardcoding.

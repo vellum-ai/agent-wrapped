@@ -16,6 +16,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 const claudeSource = require('./sources/claude.js');
 const hermesSource = require('./sources/hermes.js');
 const openclawSource = require('./sources/openclaw.js');
@@ -249,7 +250,7 @@ function collect(opts = {}) {
 
   const topics = topTopics(data.titles, stopwords, topN);
 
-  return {
+  const stats = {
     generatedAt: new Date().toISOString(),
     source,
     conversations: data.conversations,
@@ -261,6 +262,27 @@ function collect(opts = {}) {
     topTopics: topics,
     era: deriveEra(topics),
   };
+
+  /* receipt: token usage (vellum only for now) */
+  if (source === 'vellum') {
+    try {
+      const out = execFileSync('assistant', ['usage', 'totals', '--range', 'all', '--json'], {
+        encoding: 'utf8',
+        timeout: 15000,
+      });
+      const u = JSON.parse(out);
+      const totalTokens = (u.totalInputTokens || 0) + (u.totalOutputTokens || 0)
+        + (u.totalCacheCreationTokens || 0) + (u.totalCacheReadTokens || 0);
+      if (totalTokens > 0) {
+        stats.receipt = {
+          llmCalls: u.eventCount || 0,
+          totalTokens,
+        };
+      }
+    } catch { /* usage unavailable — skip receipt */ }
+  }
+
+  return stats;
 }
 
 function formatSummary(stats) {

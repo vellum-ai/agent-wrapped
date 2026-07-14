@@ -8,7 +8,7 @@ Generate the user's Agent Wrapped stats by running the bundled collector against
 node ${CLAUDE_PLUGIN_ROOT}/bin/wrapped.js --source claude
 ```
 
-Then present the results in a fun, punchy way, one stat at a time like reveal cards: conversations, days together, memories formed, times they swore, top topics, and their era. Keep it playful. React to standout numbers (a zero swear count deserves a comment, so does a huge one).
+Then present the results in a fun, punchy way, one stat at a time like reveal cards: conversations, days together, memories formed, times they swore, top topics, and the receipt (total tokens + LLM calls). Keep it playful. React to standout numbers (a zero swear count deserves a comment, so does a huge one).
 
 After presenting, offer two follow-ups:
 

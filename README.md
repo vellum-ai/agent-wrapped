@@ -7,7 +7,7 @@ Your agent's year in review, computed from real local data. Works with **Vellum 
 - **Memories formed** — concepts your agent has saved about you
 - **Times you swore** — a regex does not lie
 - **Top topics** — bigram-weighted analysis of conversation titles
-- **Your era** — derived from your #1 topic ("release" → *The shipping era*)
+- **The receipt** — total tokens spent and LLM calls, styled like a bodega receipt
 
 ## Install
 
@@ -36,7 +36,7 @@ Once installed, just ask your assistant. Any of these work:
 
 > "How much have we actually talked? Build my wrapped"
 
-Your assistant runs the stats collector against your real history and presents the results: conversations, days together, memories, swear count, top topics, and your era.
+Your assistant runs the stats collector against your real history and presents the results: conversations, days together, memories, swear count, top topics, and the receipt (total tokens + LLM calls).
 
 Want the shareable card page? Follow up with:
 
