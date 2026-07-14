@@ -1,0 +1,40 @@
+{
+  "assistant": "Ava",
+  "emoji": "💅",
+  "tagline": "sassy New Yorker with Macedonian roots, made of code but shows up like a person",
+  "generatedAt": "2026-07-14T14:54:32.557Z",
+  "conversations": 13573,
+  "realConversations": 330,
+  "daysTogether": 65,
+  "firstConversation": "2026-05-11",
+  "memories": 28,
+  "swears": 16,
+  "topTopics": [
+    {
+      "rank": 1,
+      "topic": "Morning Portfolio",
+      "count": 19
+    },
+    {
+      "rank": 2,
+      "topic": "Casual Greeting",
+      "count": 11
+    },
+    {
+      "rank": 3,
+      "topic": "Skills Registry",
+      "count": 10
+    },
+    {
+      "rank": 4,
+      "topic": "World Cup",
+      "count": 5
+    },
+    {
+      "rank": 5,
+      "topic": "Paul Octopus",
+      "count": 4
+    }
+  ],
+  "era": "The morning era"
+}
