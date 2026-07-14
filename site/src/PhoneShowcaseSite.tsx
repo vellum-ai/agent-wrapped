@@ -14,6 +14,11 @@ export interface WrappedData {
   swears: number;
   topTopics: { rank: number; topic: string; count: number }[];
   era: string;
+  source?: string;
+  receipt?: {
+    llmCalls?: number;
+    totalTokens?: number;
+  };
 }
 
 interface Slide {
@@ -26,8 +31,15 @@ interface Slide {
 
 const fmt = (n: number) => (n ?? 0).toLocaleString('en-US');
 
+const fmtTokens = (n: number) => {
+  if (n >= 1e9) return (n / 1e9).toFixed(1).replace(/\.0$/, '') + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+  return String(n);
+};
+
 function buildSlides(wrapped: WrappedData): Slide[] {
-  const firstDate = new Date(wrapped.firstConversation + 'T00:00:00');
+    const firstDate = new Date(wrapped.firstConversation + 'T00:00:00');
   const firstLabel = firstDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   return [
     {
@@ -85,12 +97,12 @@ function buildSlides(wrapped: WrappedData): Slide[] {
     },
     {
       bg: eraBg,
-      label: 'Your era',
+      label: 'Tokens spent',
       contentPosition: 'center',
       content: (
         <>
-          <div class="card-big-text">{wrapped.era}</div>
-          {wrapped.tagline ? <div class="card-desc">{wrapped.tagline}</div> : null}
+          <div class="card-number">{wrapped.receipt?.totalTokens ? fmtTokens(wrapped.receipt.totalTokens) : '???'}</div>
+          <div class="card-desc">tokens across {wrapped.receipt?.llmCalls ? fmt(wrapped.receipt.llmCalls) : '???'} LLM calls</div>
         </>
       ),
     },

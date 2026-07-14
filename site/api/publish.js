@@ -55,7 +55,10 @@ export default async function handler(req) {
   const missing = REQUIRED.filter((f) => page[f] === undefined || page[f] === null);
   if (missing.length) return json({ error: `Missing: ${missing.join(', ')}` }, 400);
 
-  delete page.source;
+  // keep source for platform attribution in share text; sanitize to known values
+  const KNOWN_SOURCES = ['vellum', 'claude', 'hermes', 'openclaw'];
+  if (page.source && !KNOWN_SOURCES.includes(String(page.source).toLowerCase())) delete page.source;
+  else if (page.source) page.source = String(page.source).toLowerCase();
 
   const pageJson = JSON.stringify(page, null, 2) + '\n';
   const content = toBase64(pageJson);

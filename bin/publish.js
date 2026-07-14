@@ -197,7 +197,6 @@ function ask(question) {
     ...(flag('--tagline') || stats.tagline ? { tagline: flag('--tagline') || stats.tagline } : {}),
     ...stats,
   };
-  delete page.source;
   const pageJson = JSON.stringify(page, null, 2);
 
   // 3. consent gate — show exactly what leaves the machine
