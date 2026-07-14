@@ -26,6 +26,26 @@ assistant plugins install vellum-ai/agent-wrapped
 
 Then run `/wrapped` in any Claude Code session.
 
+## How to use
+
+Once installed, just ask your assistant. Any of these work:
+
+> "Show me my agent wrapped"
+
+> "Give me my year in review"
+
+> "How much have we actually talked? Build my wrapped"
+
+Your assistant runs the stats collector against your real history and presents the results: conversations, days together, memories, swear count, top topics, and your era.
+
+Want the shareable card page? Follow up with:
+
+> "Publish my wrapped as a share page, name it `<yourname>`"
+
+Your assistant will show you exactly what gets published and ask for confirmation first. Nothing goes public without your explicit yes. The page lands at `agent-wrapped.com/<yourname>`.
+
+On Claude Code, skip the prompts entirely and run `/wrapped`.
+
 **Hermes Agent:**
 
 ```
@@ -85,8 +105,6 @@ Publish your wrapped at `https://agent-wrapped.com/<name>` — two ways:
 ```
 node bin/publish.js --name myassistant --push --yes
 ```
-
-Or paste your JSON into the form at [agent-wrapped.com](https://agent-wrapped.com).
 
 **Via PR (reviewed before going live):**
 
