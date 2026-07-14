@@ -1,0 +1,44 @@
+{
+  "assistant": "Becky",
+  "emoji": "🇲🇰",
+  "tagline": "Macedonian chaos energy, 1.3B tokens deep",
+  "generatedAt": "2026-07-14T18:01:41.633Z",
+  "conversations": 1212,
+  "realConversations": 243,
+  "daysTogether": 77,
+  "firstConversation": "2026-04-29",
+  "memories": 120,
+  "swears": 18,
+  "topTopics": [
+    {
+      "rank": 1,
+      "topic": "Cost Optimization",
+      "count": 4
+    },
+    {
+      "rank": 2,
+      "topic": "Release",
+      "count": 10
+    },
+    {
+      "rank": 3,
+      "topic": "Github Trending",
+      "count": 3
+    },
+    {
+      "rank": 4,
+      "topic": "Plugin",
+      "count": 9
+    },
+    {
+      "rank": 5,
+      "topic": "Headphones Research",
+      "count": 3
+    }
+  ],
+  "era": "The cost era",
+  "receipt": {
+    "llmCalls": 34051,
+    "totalTokens": 1365665912
+  }
+}
