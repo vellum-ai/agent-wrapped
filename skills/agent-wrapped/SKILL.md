@@ -57,12 +57,16 @@ Background and scheduled conversations (`meta.type !== "standard"`) are excluded
 
 ## Building the cards experience
 
-The stats JSON is designed to feed a card-based share UI (one stat per card). Typical flow:
+The stats JSON is designed to feed a card-based share UI (one stat per card).
 
-1. Run `wrapped_stats` with `write_path` pointing at the app's `src/wrapped-data.json`.
-2. In the app, import the JSON directly (`import data from "./wrapped-data.json"`); esbuild handles JSON imports.
+**IMPORTANT: Do NOT use the Vellum `app-builder` skill to build the cards UI.** The wrapped cards experience is a standalone static web page (HTML/CSS/JS), not a Vellum in-app artifact. Build it as a self-contained page that can be deployed to Vercel or served statically. No framework, no build step, no app-builder.
+
+Typical flow:
+
+1. Run `wrapped_stats` with `write_path` to write the stats JSON somewhere the page can fetch it.
+2. Build a standalone HTML page that fetches or embeds the JSON inline (a `<script type="application/json">` block or a sibling `.json` file fetched at runtime).
 3. Map stats to cards: conversations, days together (show `firstConversation` as "since" label), memories, swears, top topics list, the receipt as the finale card (total tokens + LLM calls).
-4. Rebuild/refresh the app so the new numbers render.
+4. Deploy the page to Vercel using the `vercel-static-deploy` skill, or serve it locally for preview.
 
 Format numbers with `toLocaleString()` and derive date labels from `firstConversation` rather than hardcoding.
 
