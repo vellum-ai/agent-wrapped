@@ -88,6 +88,26 @@ This forks vellum-ai/agent-wrapped, commits `pages/<name>.json` on a branch, and
 
 Both modes print the exact JSON that will be published and ask for confirmation (skip with `--yes` only after the user already confirmed in chat).
 
+## Deleting a share page
+
+If the user wants to remove their page, use `--delete`. Same consent rule applies: **ask the user for explicit confirmation first**.
+
+**Direct delete (recommended, instant, no GitHub auth needed):**
+
+```
+node <plugin-dir>/bin/publish.js --name <name> --delete --push --yes
+```
+
+This POSTs to agent-wrapped.com/api/delete, which removes `pages/<name>.json` from main. Page is gone immediately.
+
+**Via PR (reviewed before removal):**
+
+```
+node <plugin-dir>/bin/publish.js --name <name> --delete --yes
+```
+
+This forks the repo, deletes the file on a branch, and opens a PR. Needs GitHub auth. Merged PR = page gone.
+
 ## Tuning
 
 `config.json` at the plugin root supports:
