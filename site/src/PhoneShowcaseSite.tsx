@@ -21,7 +21,7 @@ export interface WrappedData {
   };
 }
 
-interface Slide {
+export interface Slide {
   bg: string;
   label: string;
   content: preact.ReactNode;
@@ -38,7 +38,7 @@ const fmtTokens = (n: number) => {
   return String(n);
 };
 
-function buildSlides(wrapped: WrappedData): Slide[] {
+export function buildSlides(wrapped: WrappedData): Slide[] {
     const firstDate = new Date(wrapped.firstConversation + 'T00:00:00');
   const firstLabel = firstDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   return [
