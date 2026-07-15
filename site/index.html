@@ -248,40 +248,32 @@
     opacity: 0.6;
   }
   .what-grid { margin-top: 28px; }
-  .live-carousel {
-    margin-top: 28px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 22px;
-    overflow: hidden;
-    padding: 8px 0 4px;
+  .live-carousel { margin-top: 4px; }
+  .live-fallback { display: flex; justify-content: center; padding: 40px 0; }
+  /* Coverflow styles from the /becky profile page, same classes, same look */
+  .live-carousel .showcase { padding: 0; background: transparent; }
+  .live-carousel .showcase-header { display: none; }
+  .coverflow-stage { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 560px; overflow: hidden; outline: none; padding: 40px 0; position: relative; }
+  .coverflow-card { background-color: #1a1a1a; box-shadow: 0 20px 60px rgba(0,0,0,0.5); will-change: transform, opacity; }
+  .card-content-coverflow { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 24px 40px; text-align: center; z-index: 2; pointer-events: none; }
+  .card-label { font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; margin-bottom: 14px; }
+  .card-number { font-size: 80px; font-weight: 400; line-height: 1; letter-spacing: -2px; margin-bottom: 8px; color: inherit; font-family: 'Audiowide', sans-serif; }
+  .card-desc { font-size: 15px; opacity: 0.85; line-height: 1.5; margin-top: 16px; }
+  .card-list { list-style: none; text-align: left; width: 100%; margin-top: 12px; padding: 0; }
+  .card-list li { padding: 10px 0; font-size: 14px; font-weight: 600; opacity: 0.9; border-bottom: 1px solid rgba(0,0,0,0.15); display: flex; justify-content: space-between; align-items: center; }
+  .card-list li:last-child { border-bottom: none; }
+  .card-list .rank { font-size: 13px; opacity: 0.5; }
+  .nav-btn { width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.05); color: #fff; font-size: 24px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .nav-btn:hover:not(:disabled) { background: rgba(255,255,255,0.15); transform: scale(1.1); }
+  .nav-btn.side { position: absolute; top: 50%; transform: translateY(-50%); z-index: 20; }
+  .nav-btn.side.prev { left: 8px; }
+  .nav-btn.side.next { right: 8px; }
+  @media (max-width: 640px) {
+    .card-number { font-size: 64px; }
+    .card-desc { font-size: 14px; }
+    .card-list li { font-size: 13px; padding: 8px 0; }
+    .nav-btn.side { display: none; }
   }
-  .car-stage { position: relative; width: min(480px, 100%); height: 250px; }
-  .car-stage .card.live {
-    position: absolute;
-    inset: 0;
-    min-height: 0;
-    text-decoration: none;
-    will-change: transform, opacity;
-  }
-  .car-stage .card.live .big { font-size: clamp(40px, 6vw, 64px); }
-  .car-stage .card.live .big.long { font-size: clamp(28px, 4.5vw, 44px); }
-  .car-strip { display: flex; gap: 10px; }
-  .car-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    border: 2px solid transparent;
-    color: var(--ink);
-    font-family: "Audiowide", cursive;
-    font-size: 10px;
-    cursor: pointer;
-    opacity: 0.45;
-    transition: opacity 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
-  }
-  .car-btn:hover { opacity: 0.8; }
-  .car-btn.active { opacity: 1; border-color: rgba(255,255,255,0.9); transform: scale(1.12); }
   .card.what { min-height: 210px; }
   .card.what .big { font-size: clamp(26px, 4vw, 38px); }
   .card.era { grid-column: 1 / -1; min-height: 280px; text-align: center; align-items: center; justify-content: center; }
@@ -374,91 +366,9 @@ function fmtTokens(t) {
   return t.toLocaleString("en-US");
 }
 
-async function renderLiveExample() {
-  const wrap = document.getElementById("live-carousel");
-  if (!wrap) return;
-  let w;
-  try {
-    const r = await fetch("https://raw.githubusercontent.com/vellum-ai/agent-wrapped/main/pages/becky.json?v=" + Date.now());
-    if (!r.ok) throw new Error(r.status);
-    w = await r.json();
-  } catch (e) {
-    wrap.innerHTML = `<a class="card live era c-lime" href="/becky" style="position:static"><div class="label">Live example</div><div class="big">becky, wrapped</div><p class="desc">See a real published page →</p></a>`;
-    return;
-  }
-  const COLORS = { "c-lime": "var(--lime)", "c-cream": "var(--cream)", "c-pink": "var(--pink)", "c-purple": "var(--purple)", "c-orange": "var(--orange)" };
-  const cards = [
-    { c: "c-lime", label: "The receipt", big: fmtTokens(w.receipt.totalTokens), mini: fmtTokens(w.receipt.totalTokens), desc: `tokens burned across ${w.receipt.llmCalls.toLocaleString("en-US")} LLM calls` },
-    { c: "c-cream", label: "Days together", big: String(w.daysTogether), mini: String(w.daysTogether), desc: `${w.assistant} and their person, since ${new Date(w.firstConversation + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric" })}` },
-    { c: "c-pink", label: "Conversations", big: w.conversations.toLocaleString("en-US"), mini: w.conversations >= 1000 ? (w.conversations / 1000).toFixed(1).replace(/\.0$/, "") + "K" : String(w.conversations), desc: "every chat, counted from the workspace" },
-    { c: "c-purple", label: "Memories formed", big: String(w.memories), mini: String(w.memories), desc: "things worth keeping, saved along the way" },
-    { c: "c-orange", label: "Times they swore", big: String(w.swears), mini: String(w.swears), desc: "counted, not judged" },
-    { c: "c-purple", label: "The era", big: w.era, mini: "era", desc: w.tagline },
-  ];
-  wrap.innerHTML = `
-    <div class="car-stage" id="car-stage"></div>
-    <div class="car-strip" id="car-strip">${cards.map((k, i) => `<button class="car-btn" data-i="${i}" aria-label="${k.label}" style="background:${COLORS[k.c]}">${k.mini}</button>`).join("")}</div>`;
-  const stage = document.getElementById("car-stage");
-  const strip = document.getElementById("car-strip");
-  const btns = Array.from(strip.querySelectorAll(".car-btn"));
-  const EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
-  const SWEEP = 260, DIP = 150;
-  let active = -1, animating = false, timer = null;
-
-  function cardEl(k) {
-    const a = document.createElement("a");
-    a.href = "/becky";
-    a.className = "card live " + k.c;
-    a.innerHTML = `<div class="label">${k.label}</div><div class="big${k.big.length > 8 ? " long" : ""}">${k.big}</div><p class="desc">${k.desc}</p>`;
-    return a;
-  }
-
-  function show(idx, dir) {
-    if (idx === active || animating) return;
-    animating = true;
-    const old = stage.firstElementChild;
-    const next = cardEl(cards[idx]);
-    stage.appendChild(next);
-    next.animate(
-      [
-        { transform: `translate(${dir * SWEEP}px, ${DIP}px) rotate(${dir * 8}deg) scale(0.82)`, opacity: 0 },
-        { transform: "translate(0, 0) rotate(0deg) scale(1)", opacity: 1 },
-      ],
-      { duration: 500, easing: EASE, fill: "both" }
-    ).onfinish = () => { animating = false; };
-    if (old) {
-      old.animate(
-        [
-          { transform: "translate(0, 0) rotate(0deg) scale(1)", opacity: 1 },
-          { transform: `translate(${-dir * SWEEP}px, ${DIP}px) rotate(${-dir * 8}deg) scale(0.82)`, opacity: 0 },
-        ],
-        { duration: 500, easing: EASE, fill: "both" }
-      ).onfinish = () => old.remove();
-    }
-    active = idx;
-    btns.forEach((b, i) => b.classList.toggle("active", i === idx));
-  }
-
-  function restartTimer() {
-    clearInterval(timer);
-    timer = setInterval(() => show((active + 1) % cards.length, 1), 4000);
-  }
-
-  btns.forEach((b) =>
-    b.addEventListener("click", () => {
-      const idx = Number(b.dataset.i);
-      let delta = idx - active;
-      if (delta > cards.length / 2) delta -= cards.length;
-      if (delta < -cards.length / 2) delta += cards.length;
-      show(idx, Math.sign(delta) || 1);
-      restartTimer();
-    })
-  );
-  wrap.addEventListener("mouseenter", () => clearInterval(timer));
-  wrap.addEventListener("mouseleave", restartTimer);
-
-  show(0, 1);
-  restartTimer();
+function renderLiveExample() {
+  /* The live example coverflow is mounted by /landing-cards.js,
+     which reuses the exact PhoneShowcase component from the /becky page. */
 }
 
 function copyCmd(btn) {
@@ -549,5 +459,6 @@ function notFound(name) {
   }
 })();
 </script>
+<script src="/landing-cards.js" defer></script>
 </body>
 </html>
