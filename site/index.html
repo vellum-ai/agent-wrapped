@@ -26,15 +26,30 @@
     font-family: "Space Grotesk", system-ui, sans-serif;
     min-height: 100vh;
   }
-  .wrap { max-width: 1080px; margin: 0 auto; padding: 48px 24px 96px; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 110px 24px 96px; }
+  .site-header {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    width: min(1080px - 48px, calc(100% - 48px));
+    display: flex;
+    align-items: center;
+    padding: 14px 22px;
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 999px;
+    background: rgba(17, 17, 17, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
   .brand {
     font-family: "Audiowide", cursive;
     font-size: 15px;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    opacity: 0.85;
   }
-  .brand a { color: inherit; text-decoration: none; }
+  .brand a { color: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; }
   .hero { padding: 96px 0 64px; }
   .hero h1 {
     font-family: "Audiowide", cursive;
@@ -240,8 +255,10 @@
 </style>
 </head>
 <body>
-<div class="wrap">
+<header class="site-header">
   <div class="brand"><a href="/">🎁 agent wrapped</a></div>
+</header>
+<div class="wrap">
   <div id="app"><div class="loading">LOADING…</div></div>
 </div>
 <script>
