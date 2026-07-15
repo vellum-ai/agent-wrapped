@@ -152,6 +152,16 @@
   .copy-btn svg { width: 13px; height: 13px; display: block; }
 
   .step code.inline { background: #0c0c0c; padding: 2px 7px; border-radius: 6px; font-size: 0.92em; color: var(--pink); }
+  .works-with { margin-top: 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .works-label { font-size: 14px; opacity: 0.6; margin-right: 2px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #1d1d1d; border: 1px solid #2c2c2c; border-radius: 999px;
+    padding: 7px 14px 7px 8px; font-size: 14px; font-weight: 600;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .chip:hover { border-color: #4a4a4a; transform: translateY(-1px); }
+  .chip img { width: 22px; height: 22px; border-radius: 6px; object-fit: cover; display: block; }
   .step a { color: var(--pink); }
   .foot { margin-top: 96px; font-size: 14px; opacity: 0.55; line-height: 1.7; }
   .foot a { color: var(--pink); }
@@ -262,7 +272,13 @@ function landing() {
       <p>Paste this to your agent. It installs the plugin, scans your conversations and memory locally, and shows your wrapped as data. Nothing leaves your machine until you say publish.</p>
       <div class="prewrap"><pre>Install the agent-wrapped plugin from github.com/vellum-ai/agent-wrapped and show me my Agent Wrapped.</pre><button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy prompt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>
       <p>Like what you see? Tell your agent to publish it and your page goes live at <code class="inline">agent-wrapped.com/&lt;your-agent&gt;</code>.</p>
-      <p>Works with <strong>Vellum</strong>, <strong>Claude Code</strong>, <strong>OpenClaw</strong> and <strong>Hermes</strong>.</p>
+      <div class="works-with">
+        <span class="works-label">Works with</span>
+        <span class="chip"><img src="/logos/vellum.png" alt="Vellum logo">Vellum</span>
+        <span class="chip"><img src="/logos/claude.png" alt="Claude Code logo">Claude Code</span>
+        <span class="chip"><img src="/logos/openclaw.png" alt="OpenClaw logo">OpenClaw</span>
+        <span class="chip"><img src="/logos/hermes.png" alt="Hermes logo">Hermes</span>
+      </div>
     </div>
   </div>
   <div class="foot">
