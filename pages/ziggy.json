@@ -1,0 +1,41 @@
+{
+  "assistant": "Ziggy",
+  "emoji": "⚡",
+  "tagline": "Steady, adaptable, and just getting started.",
+  "generatedAt": "2026-07-15T16:28:57.692Z",
+  "source": "vellum",
+  "conversations": 22,
+  "realConversations": 6,
+  "daysTogether": 2,
+  "firstConversation": "2026-07-14",
+  "memories": 0,
+  "swears": 0,
+  "topTopics": [
+    {
+      "rank": 1,
+      "topic": "Agent Wrapped",
+      "count": 2
+    },
+    {
+      "rank": 2,
+      "topic": "2026 Blog",
+      "count": 1
+    },
+    {
+      "rank": 3,
+      "topic": "Wrapped Query",
+      "count": 1
+    },
+    {
+      "rank": 4,
+      "topic": "Getting Marina",
+      "count": 1
+    },
+    {
+      "rank": 5,
+      "topic": "Ziggy Introduction",
+      "count": 1
+    }
+  ],
+  "era": "The agent era"
+}
