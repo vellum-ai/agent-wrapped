@@ -248,6 +248,10 @@
     opacity: 0.6;
   }
   .what-grid { margin-top: 28px; }
+  .live-grid { margin-top: 28px; }
+  a.card.live { text-decoration: none; transition: transform 0.18s ease; }
+  a.card.live:hover { transform: translateY(-4px); }
+  .card.live.era .big { font-size: clamp(36px, 6vw, 64px); }
   .card.what { min-height: 210px; }
   .card.what .big { font-size: clamp(26px, 4vw, 38px); }
   .card.era { grid-column: 1 / -1; min-height: 280px; text-align: center; align-items: center; justify-content: center; }
@@ -323,9 +327,51 @@ function landing() {
       </div>
     </div>
   </div>
+  <div class="steps-head" id="live-example">
+    <h2>SEE A LIVE ONE</h2>
+    <a class="btn" href="/becky">agent-wrapped.com/becky →</a>
+  </div>
+  <div class="grid live-grid" id="live-grid"></div>
   <div class="foot">
     Built by <a href="https://vellum.ai">Vellum</a>. Fully <a href="${REPO}">open source</a>. Everything is computed locally from your own data, and nothing is published without your say-so.
   </div>`;
+  renderLiveExample();
+}
+
+function fmtTokens(t) {
+  if (t >= 1e9) return (t / 1e9).toFixed(1).replace(/\.0$/, "") + "B";
+  if (t >= 1e6) return (t / 1e6).toFixed(1).replace(/\.0$/, "") + "M";
+  return t.toLocaleString("en-US");
+}
+
+async function renderLiveExample() {
+  const grid = document.getElementById("live-grid");
+  if (!grid) return;
+  try {
+    const r = await fetch("https://raw.githubusercontent.com/vellum-ai/agent-wrapped/main/pages/becky.json?v=" + Date.now());
+    if (!r.ok) throw new Error(r.status);
+    const w = await r.json();
+    const cards = [
+      { c: "c-lime", label: "The receipt", big: fmtTokens(w.receipt.totalTokens), desc: `tokens burned across ${w.receipt.llmCalls.toLocaleString("en-US")} LLM calls` },
+      { c: "c-cream", label: "Days together", big: String(w.daysTogether), desc: `${w.assistant} and their person, since ${new Date(w.firstConversation + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric" })}` },
+      { c: "c-pink", label: "Conversations", big: w.conversations.toLocaleString("en-US"), desc: "every chat, counted from the workspace" },
+      { c: "c-purple", label: "Memories formed", big: String(w.memories), desc: "things worth keeping, saved along the way" },
+      { c: "c-orange", label: "Times they swore", big: String(w.swears), desc: "counted, not judged" },
+    ];
+    grid.innerHTML = cards.map((k) => `
+      <a class="card live ${k.c}" href="/becky">
+        <div class="label">${k.label}</div>
+        <div class="big">${k.big}</div>
+        <p class="desc">${k.desc}</p>
+      </a>`).join("") + `
+      <a class="card live era c-purple" href="/becky">
+        <div class="label">The era</div>
+        <div class="big">${w.era}</div>
+        <p class="desc">${w.tagline}</p>
+      </a>`;
+  } catch (e) {
+    grid.innerHTML = `<a class="card live c-lime era" href="/becky"><div class="label">Live example</div><div class="big">becky, wrapped</div><p class="desc">See a real published page →</p></a>`;
+  }
 }
 
 function copyCmd(btn) {
