@@ -19,13 +19,13 @@ const PLATFORM_HANDLES: Record<string, string> = {
 
 function shareText(w: WrappedData): string {
   const handle = w.source ? PLATFORM_HANDLES[w.source] : undefined;
-  const built = handle ? ` (built on ${handle})` : '';
+  const powered = handle ? `\n\nPowered by ${handle}` : '';
   if (w.receipt?.totalTokens) {
     const t = w.receipt.totalTokens;
     const fmt = t >= 1e9 ? (t / 1e9).toFixed(1).replace(/\.0$/, '') + 'B' : t >= 1e6 ? (t / 1e6).toFixed(1).replace(/\.0$/, '') + 'M' : t.toLocaleString('en-US');
-    return `${w.assistant} and I burned ${fmt} tokens in ${w.daysTogether} days. show me your agent's receipt 🧾${built}`;
+    return `${w.assistant} and I burned ${fmt} tokens in ${w.daysTogether} days 🤯\n\nWhat's your count?${powered}`;
   }
-  return `${w.assistant} and I: ${w.conversations.toLocaleString('en-US')} conversations in ${w.daysTogether} days. show me your agent's wrapped 🎁${built}`;
+  return `${w.assistant} and I: ${w.conversations.toLocaleString('en-US')} conversations in ${w.daysTogether} days 🤯\n\nWhat's your count?${powered}`;
 }
 
 const TwitterIcon = () => (

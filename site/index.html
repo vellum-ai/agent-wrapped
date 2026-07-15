@@ -43,6 +43,32 @@
     color: var(--lime);
   }
   .hero h1 span { color: var(--pink); }
+
+  /* shiny pill title sweep */
+  .shiny-title {
+    position: relative;
+    display: inline-block;
+  }
+  .shiny-title .shine-base { color: var(--lime); }
+  .shiny-title .shine-base span { color: var(--pink); }
+  .shiny-title .shine-layer {
+    position: absolute;
+    inset: 0;
+    color: var(--cream);
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(to right, transparent 30%, #000 50%, transparent 70%);
+    mask-image: linear-gradient(to right, transparent 30%, #000 50%, transparent 70%);
+    -webkit-mask-size: 150% auto;
+    mask-size: 150% auto;
+    animation: shinySweep 2s ease-in-out infinite;
+  }
+  @keyframes shinySweep {
+    0% { -webkit-mask-position: 200%; mask-position: 200%; }
+    100% { -webkit-mask-position: -100%; mask-position: -100%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .shiny-title .shine-layer { animation: none; }
+  }
   .hero p.sub {
     margin-top: 24px;
     font-size: clamp(17px, 2.4vw, 22px);
@@ -200,6 +226,7 @@
   .err p { margin-top: 18px; font-size: 18px; opacity: 0.75; }
   .err .cta-row { justify-content: center; }
   .loading { padding: 140px 0; text-align: center; font-family: "Audiowide", cursive; opacity: 0.6; letter-spacing: 0.1em; }
+
 </style>
 </head>
 <body>
@@ -218,7 +245,7 @@ function landing() {
   document.title = "Agent Wrapped";
   app.innerHTML = `
   <div class="hero">
-    <h1>Your agent,<br><span>wrapped.</span></h1>
+    <h1 class="shiny-title"><span class="shine-base">Your agent,<br><span>wrapped.</span></span><span class="shine-layer" aria-hidden="true">Your agent,<br>wrapped.</span></h1>
     <p class="sub">Your agent's year in review. Conversations, days together, memories formed, times you swore. Real data from your own workspace, zero vibes-based estimates.</p>
     <div class="cta-row">
       <a class="btn primary" href="/becky">See a live one →</a>
@@ -227,42 +254,20 @@ function landing() {
   </div>
   <div class="steps-head">
     <h2>HOW IT WORKS</h2>
-    <div class="platform-tabs" role="tablist">
-      <button id="tab-vellum" class="active" onclick="setPlatform('vellum')">Vellum</button>
-      <button id="tab-claude" onclick="setPlatform('claude')">Claude Code</button>
-      <button id="tab-hermes" onclick="setPlatform('hermes')">Hermes Agent</button>
-      <button id="tab-openclaw" onclick="setPlatform('openclaw')">OpenClaw</button>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="n">One prompt</div>
+      <h3>Ask your agent</h3>
+      <p>Paste this to your agent. It installs the plugin, scans your conversations and memory locally, and shows your wrapped as data. Nothing leaves your machine until you say publish.</p>
+      <div class="prewrap"><pre>Install the agent-wrapped plugin from github.com/vellum-ai/agent-wrapped and show me my Agent Wrapped.</pre><button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy prompt"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>
+      <p>Like what you see? Tell your agent to publish it and your page goes live at <code class="inline">agent-wrapped.com/&lt;your-agent&gt;</code>.</p>
     </div>
   </div>
-  <div class="steps" id="steps"></div>
   <div class="foot">
     Built with the <a href="${REPO}">agent-wrapped</a> plugin. Works with Vellum agents and Claude Code. Everything is computed locally from your own data. You choose what to publish.
   </div>`;
-  setPlatform(localStorage.getItem("aw-platform") || "vellum");
 }
-
-const STEPS = {
-  vellum: [
-    { n: "Step 01", h: "Install the plugin", p: "One command in your Vellum agent. It ships a stats tool, a skill, and the CLI.", pre: "assistant plugins install vellum-ai/agent-wrapped" },
-    { n: "Step 02", h: "Generate your wrapped", p: "Ask your agent for its wrapped, or run the CLI yourself. It scans your conversations and memory locally. Nothing leaves your machine.", pre: "node plugins/agent-wrapped/bin/wrapped.js --json > myassistant.json" },
-    { n: "Step 03", h: "Publish your page", p: `Add your agent's name and a tagline to the JSON, then open a PR adding it as <code class="inline">pages/&lt;your-agent&gt;.json</code> in <a href="${REPO}">the repo</a>. Once merged, your page is live at <code class="inline">/&lt;your-agent&gt;</code>. Or just tell your agent to publish it, it knows the way.` },
-  ],
-  claude: [
-    { n: "Step 01", h: "Install the plugin", p: "Two commands inside Claude Code. It adds the marketplace and installs the plugin with the /wrapped command.", pre: "/plugin marketplace add vellum-ai/agent-wrapped\n/plugin install agent-wrapped@agent-wrapped" },
-    { n: "Step 02", h: "Generate your wrapped", p: "Run /wrapped in any session. Claude scans your local history (~/.claude) and presents your stats. Nothing leaves your machine.", pre: "/wrapped" },
-    { n: "Step 03", h: "Publish your page", p: `Ask Claude to save the JSON, add a name and tagline, then open a PR adding it as <code class="inline">pages/&lt;your-agent&gt;.json</code> in <a href="${REPO}">the repo</a>. Once merged, your page is live at <code class="inline">/&lt;your-agent&gt;</code>.` },
-  ],
-  hermes: [
-    { n: "Step 01", h: "Get the CLI", p: "Clone the repo. No plugin system needed, the wrapped CLI reads Hermes history directly.", pre: "git clone https://github.com/vellum-ai/agent-wrapped" },
-    { n: "Step 02", h: "Generate your wrapped", p: "Point it at Hermes. It reads ~/.hermes/state.db locally (Node 22.5+ or Bun). Nothing leaves your machine.", pre: "node agent-wrapped/bin/wrapped.js --source hermes" },
-    { n: "Step 03", h: "Publish your page", p: `Run the publisher with your agent's name and a tagline. It opens a PR adding <code class="inline">pages/&lt;your-agent&gt;.json</code> to <a href="${REPO}">the repo</a>. Once merged, your page is live at <code class="inline">/&lt;your-agent&gt;</code>.`, pre: "node agent-wrapped/bin/publish.js --source hermes" },
-  ],
-  openclaw: [
-    { n: "Step 01", h: "Get the CLI", p: "Clone the repo. No plugin system needed, the wrapped CLI reads OpenClaw history directly.", pre: "git clone https://github.com/vellum-ai/agent-wrapped" },
-    { n: "Step 02", h: "Generate your wrapped", p: "Point it at OpenClaw. It reads your ~/.openclaw session transcripts and MEMORY.md locally. Subagent sessions don't inflate the count. Nothing leaves your machine.", pre: "node agent-wrapped/bin/wrapped.js --source openclaw" },
-    { n: "Step 03", h: "Publish your page", p: `Run the publisher with your agent's name and a tagline. It opens a PR adding <code class="inline">pages/&lt;your-agent&gt;.json</code> to <a href="${REPO}">the repo</a>. Once merged, your page is live at <code class="inline">/&lt;your-agent&gt;</code>.`, pre: "node agent-wrapped/bin/publish.js --source openclaw" },
-  ],
-};
 
 function copyCmd(btn) {
   const pre = btn.parentElement.querySelector("pre");
@@ -274,25 +279,6 @@ function copyCmd(btn) {
       btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
     }, 1600);
   });
-}
-
-function setPlatform(platform) {
-  const stepsEl = document.getElementById("steps");
-  if (!stepsEl) return;
-  localStorage.setItem("aw-platform", platform);
-  for (const key of ["vellum", "claude", "hermes", "openclaw"]) {
-    const btn = document.getElementById("tab-" + key);
-    if (btn) btn.classList.toggle("active", key === platform);
-  }
-  stepsEl.innerHTML = (STEPS[platform] || STEPS.vellum)
-    .map((st) => `
-    <div class="step">
-      <div class="n">${st.n}</div>
-      <h3>${st.h}</h3>
-      <p>${st.p}</p>
-      ${st.pre ? `<div class="prewrap"><pre>${st.pre}</pre><button class="copy-btn" onclick="copyCmd(this)" aria-label="Copy command"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div>` : ""}
-    </div>`)
-    .join("");
 }
 
 function profile(name, d) {
