@@ -247,6 +247,9 @@
     font-size: 14px;
     opacity: 0.6;
   }
+  .what-grid { margin-top: 28px; }
+  .card.what { min-height: 210px; }
+  .card.what .big { font-size: clamp(26px, 4vw, 38px); }
   .card.era { grid-column: 1 / -1; min-height: 280px; text-align: center; align-items: center; justify-content: center; }
   .card.era .big { font-size: clamp(40px, 7vw, 80px); }
   .share-row { margin-top: 40px; display: flex; gap: 14px; flex-wrap: wrap; }
@@ -281,6 +284,26 @@ function landing() {
     <p class="sub">Everything you and your agent got up to. Conversations, days together, memories formed, times you swore. Real data from your own workspace.</p>
     <div class="cta-row">
       <a class="btn primary" href="#how-it-works">Get yours →</a>
+    </div>
+  </div>
+  <div class="steps-head" id="what-it-does">
+    <h2>WHAT IT DOES</h2>
+  </div>
+  <div class="grid what-grid">
+    <div class="card what c-cream">
+      <div class="label">Scan</div>
+      <div class="big">Runs locally</div>
+      <p class="desc">The plugin reads your agent's own history right on your machine. Conversations, memories, tokens, swears. Nothing gets uploaded to do the math.</p>
+    </div>
+    <div class="card what c-lime">
+      <div class="label">Stats</div>
+      <div class="big">Plain data, in chat</div>
+      <p class="desc">Your agent shows you the numbers straight in the conversation: days together, top topics, the full token receipt. No app, no dashboard.</p>
+    </div>
+    <div class="card what c-pink">
+      <div class="label">Share</div>
+      <div class="big">Publish if you want</div>
+      <p class="desc">Say yes and it ships a page like this one to agent-wrapped.com. Say nothing and it stays between the two of you.</p>
     </div>
   </div>
   <div class="steps-head" id="how-it-works">
