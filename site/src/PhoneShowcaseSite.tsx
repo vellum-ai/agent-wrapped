@@ -109,22 +109,59 @@ export function buildSlides(wrapped: WrappedData): Slide[] {
   ];
 }
 
-/* ── 3D COVERFLOW CONSTANTS ── */
-const PERSPECTIVE = 1600;
-const SCALE_STEP = 0.16;
-const MAX_VISIBLE = 2;
-const DEPTH = 240;
-const DURATION = 0.6;
+/* ── KLARNA CAROUSEL (Originkit button-carousel motion) ── */
 const EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
-const TRANSITION_CSS = `transform ${DURATION}s ${EASE}, opacity ${DURATION}s ${EASE}`;
+const DURATION = 500;
+const SWEEP = 260;
+const DIP = 150;
+const BUTTON_SIZE = 44;
+const GAP = 10;
+const BUTTON_COUNT = 5;
 
-export const PhoneShowcase: FunctionComponent<{ wrapped: WrappedData; headerExtra?: preact.ReactNode }> = ({ wrapped, headerExtra }) => {
+function modIdx(i: number, n: number) {
+  return ((i % n) + n) % n;
+}
+
+const CardFace: FunctionComponent<{ slide: Slide; w: number; h: number; href?: string }> = ({ slide, w, h, href }) => {
+  const Tag: any = href ? 'a' : 'div';
+  return (
+    <Tag
+      href={href}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: w,
+        height: h,
+        borderRadius: 24,
+        overflow: 'hidden',
+        backgroundImage: `url("${slide.bg}")`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundColor: '#1a1a1a',
+        boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+        color: slide.textColor || '#111',
+        textDecoration: 'none',
+        display: 'block',
+        willChange: 'transform, opacity',
+      }}
+    >
+      <div class="card-content-coverflow">
+        <div class="card-label">{slide.label}</div>
+        {slide.content}
+      </div>
+    </Tag>
+  );
+};
+
+export const KlarnaCarousel: FunctionComponent<{ wrapped: WrappedData; cardHref?: string }> = ({ wrapped, cardHref }) => {
+  const slides = buildSlides(wrapped);
+  const M = slides.length;
   const [active, setActive] = useState(0);
+  const [prev, setPrev] = useState<number | null>(null);
+  const [dir, setDir] = useState(1);
   const [paused, setPaused] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const lockRef = useRef(false);
-  const slides = buildSlides(wrapped);
-  const n = slides.length;
+  const animatingRef = useRef(false);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 600);
@@ -133,140 +170,156 @@ export const PhoneShowcase: FunctionComponent<{ wrapped: WrappedData; headerExtr
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  const lock = useCallback(() => {
-    lockRef.current = true;
-    window.setTimeout(() => { lockRef.current = false; }, DURATION * 1000);
-  }, []);
+  const cardW = isMobile ? 220 : 290;
+  const cardH = isMobile ? 390 : 510;
 
-  const step = useCallback((dir: number) => {
-    if (lockRef.current) return;
-    lock();
-    setActive(a => (((a + dir) % n) + n) % n);
-  }, [n, lock]);
-
-  const handleCardClick = useCallback((i: number) => {
-    if (lockRef.current) return;
-    lock();
-    setActive(a => (i === a ? (a + 1) % n : i));
-  }, [n, lock]);
+  const select = useCallback(
+    (idx: number) => {
+      if (animatingRef.current) return;
+      setActive((a) => {
+        if (idx === a) return a;
+        let delta = modIdx(idx - a, M);
+        if (delta > M / 2) delta -= M;
+        setDir(Math.sign(delta) || 1);
+        setPrev(a);
+        animatingRef.current = true;
+        return idx;
+      });
+    },
+    [M]
+  );
 
   useEffect(() => {
     if (paused) return;
-    const id = window.setInterval(() => step(1), 4000);
+    const id = window.setInterval(() => select(modIdx(active + 1, M)), 4000);
     return () => window.clearInterval(id);
-  }, [step, paused]);
+  }, [active, paused, select, M]);
 
-  const onKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
-    else if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
-  }, [step]);
+  const onKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') { e.preventDefault(); select(modIdx(active + 1, M)); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); select(modIdx(active - 1, M)); }
+    },
+    [active, select, M]
+  );
 
-  const cardWidth = isMobile ? 220 : 290;
-  const cardHeight = isMobile ? 390 : 510;
-  const tilt = 12;
-  const sideTilt = 8;
-  const gap = 8;
-  const dimOpacity = 0.6;
+  const enterRef = useCallback(
+    (el: HTMLElement | null) => {
+      if (!el) return;
+      el.animate(
+        [
+          { transform: `translate(${dir * SWEEP}px, ${DIP}px) rotate(${dir * 8}deg) scale(0.82)`, opacity: 0 },
+          { transform: 'translate(0px, 0px) rotate(0deg) scale(1)', opacity: 1 },
+        ],
+        { duration: DURATION, easing: EASE, fill: 'both' }
+      );
+    },
+    [dir]
+  );
+
+  const exitRef = useCallback(
+    (el: HTMLElement | null) => {
+      if (!el) return;
+      const anim = el.animate(
+        [
+          { transform: 'translate(0px, 0px) rotate(0deg) scale(1)', opacity: 1 },
+          { transform: `translate(${-dir * SWEEP}px, ${DIP}px) rotate(${-dir * 8}deg) scale(0.82)`, opacity: 0 },
+        ],
+        { duration: DURATION, easing: EASE, fill: 'both' }
+      );
+      anim.onfinish = () => {
+        animatingRef.current = false;
+        setPrev(null);
+      };
+    },
+    [dir]
+  );
+
+  const half = Math.floor(Math.min(Math.max(1, BUTTON_COUNT), M) / 2);
+  const fadeInner = Math.max(0, half - 0.4);
+  const fadeEnd = half + 0.6;
+  const step = BUTTON_SIZE + GAP;
+
+  function slotOf(i: number) {
+    let slot = i - active;
+    slot = slot % M;
+    if (slot > M / 2) slot -= M;
+    if (slot < -M / 2) slot += M;
+    return slot;
+  }
 
   return (
-    <section class="showcase">
-      <div class="showcase-header">
-        <h2>{wrapped.assistant}, wrapped</h2>
-        {headerExtra}
-      </div>
-
-      <div
-        class="coverflow-stage"
-        style={{ perspective: `${PERSPECTIVE}px` }}
-        tabIndex={0}
-        role="group"
-        aria-roledescription="carousel"
-        onKeyDown={onKeyDown}
-        onMouseEnter={() => setPaused(true)}
-        onMouseLeave={() => setPaused(false)}
-      >
-        <button class="nav-btn side prev" onClick={() => step(-1)} aria-label="Previous">‹</button>
-        <button class="nav-btn side next" onClick={() => step(1)} aria-label="Next">›</button>
-        <div
-          style={{
-            position: 'relative',
-            width: cardWidth,
-            height: cardHeight,
-            transformStyle: 'preserve-3d',
-          }}
-        >
-          {slides.map((slide, i) => {
-            let rel = i - active;
-            if (rel > n / 2) rel -= n;
-            if (rel < -n / 2) rel += n;
-            const ax = Math.abs(rel);
-            const visible = ax <= MAX_VISIBLE;
-            const isActive = rel === 0;
-            const sc = Math.max(0.4, 1 - ax * SCALE_STEP);
-            const tx = rel * (gap * 30);
-            const tz = -ax * DEPTH;
-            const ry = -rel * tilt;
-            const rz = rel * sideTilt;
-
-            return (
-              <div
-                key={i}
-                class="coverflow-card"
-                style={{
-                  position: 'absolute',
-                  left: '50%',
-                  top: '50%',
-                  width: cardWidth,
-                  height: cardHeight,
-                  borderRadius: 24,
-                  overflow: 'hidden',
-                  transformStyle: 'preserve-3d',
-                  transformOrigin: 'center center',
-                  transform: `translate(-50%, -50%) translateX(${tx}px) translateZ(${tz}px) rotateY(${ry}deg) rotateZ(${rz}deg) scale(${sc})`,
-                  transition: TRANSITION_CSS,
-                  opacity: visible ? 1 : 0,
-                  cursor: isActive ? 'default' : 'pointer',
-                  pointerEvents: visible ? 'auto' : 'none',
-                  backgroundImage: `url("${slide.bg}")`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                }}
-                onClick={() => handleCardClick(i)}
-                aria-label={slide.label}
-                aria-hidden={!visible}
-              >
-                <div
-                  class="card-content-coverflow"
-                  style={{
-                    opacity: isActive ? 1 : 0,
-                    transition: `opacity ${DURATION}s ${EASE}`,
-                    color: slide.textColor || '#000',
-                    ...(slide.contentPosition === 'bottom' ? {
-                      justifyContent: 'flex-end',
-                      paddingBottom: '16px',
-                    } : {}),
-                  }}
-                >
-                  <div class="card-label">{slide.label}</div>
-                  {slide.content}
-                </div>
-
-                <div
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: '#000',
-                    opacity: isActive ? 0 : dimOpacity,
-                    transition: `opacity ${DURATION}s ${EASE}`,
-                    pointerEvents: 'none',
-                  }}
-                />
-              </div>
-            );
-          })}
+    <div
+      class="klarna-wrap"
+      tabIndex={0}
+      role="group"
+      aria-roledescription="carousel"
+      onKeyDown={onKeyDown}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+    >
+      <div class="klarna-stage" style={{ width: cardW, height: cardH }}>
+        {prev !== null && (
+          <div key={`exit-${prev}-${active}`} ref={exitRef as any} style={{ position: 'absolute', inset: 0 }}>
+            <CardFace slide={slides[prev]} w={cardW} h={cardH} href={cardHref} />
+          </div>
+        )}
+        <div key={`enter-${active}`} ref={enterRef as any} style={{ position: 'absolute', inset: 0 }}>
+          <CardFace slide={slides[active]} w={cardW} h={cardH} href={cardHref} />
         </div>
       </div>
 
-    </section>
+      <div class="klarna-strip" style={{ height: BUTTON_SIZE + 12 }}>
+        {slides.map((slide, i) => {
+          const slot = slotOf(i);
+          const ax = Math.abs(slot);
+          const depth = Math.max(0, 1 - (0.55 * ax) / Math.max(1, half));
+          const scale = 0.55 + 0.45 * depth;
+          const opacity = ax <= fadeInner ? 1 : ax >= fadeEnd ? 0 : 1 - (ax - fadeInner) / (fadeEnd - fadeInner);
+          const isActive = i === active;
+          return (
+            <button
+              key={i}
+              aria-label={slide.label}
+              onClick={() => select(i)}
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                width: BUTTON_SIZE,
+                height: BUTTON_SIZE,
+                marginLeft: -BUTTON_SIZE / 2,
+                marginTop: -BUTTON_SIZE / 2,
+                transform: `translateX(${slot * step}px) scale(${scale})`,
+                opacity,
+                pointerEvents: opacity < 0.05 ? 'none' : 'auto',
+                transition: `transform 0.32s ${EASE}, opacity 0.32s ${EASE}, box-shadow 0.2s ease`,
+                borderRadius: '50%',
+                border: 'none',
+                padding: 0,
+                overflow: 'hidden',
+                cursor: 'pointer',
+                backgroundImage: `url("${slide.bg}")`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundColor: '#1a1a1a',
+                boxShadow: isActive ? '0 0 0 2px rgba(255,255,255,0.95)' : '0 0 0 1px rgba(255,255,255,0.2)',
+                willChange: 'transform, opacity',
+              }}
+            />
+          );
+        })}
+      </div>
+    </div>
   );
 };
+
+export const PhoneShowcase: FunctionComponent<{ wrapped: WrappedData; headerExtra?: preact.ReactNode }> = ({ wrapped, headerExtra }) => (
+  <section class="showcase">
+    <div class="showcase-header">
+      <h2>{wrapped.assistant}, wrapped</h2>
+      {headerExtra}
+    </div>
+    <KlarnaCarousel wrapped={wrapped} />
+  </section>
+);
