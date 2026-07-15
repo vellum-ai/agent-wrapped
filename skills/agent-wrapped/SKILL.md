@@ -4,8 +4,8 @@ description: >-
   Generate an "Agent Wrapped" year-in-review from real workspace data:
   conversation count, days together, memories formed, swear count, top topics,
   and the receipt (total tokens + LLM calls). Use when the user asks for
-  their wrapped, a year in review, a usage recap, or wants to build or
-  refresh wrapped share cards from their agent history.
+  their wrapped, a year in review, or a usage recap. Present the stats as
+  plain data in chat, then offer to publish a share page at agent-wrapped.com.
 metadata:
   emoji: "🎁"
   vellum:
@@ -14,15 +14,25 @@ metadata:
     activation-hints:
       - "User asks for their agent wrapped, assistant wrapped, or year in review"
       - "User wants a recap of how much they've used their agent"
-      - "User wants wrapped-style share cards from their chat history"
-      - "User wants to refresh the data behind their wrapped cards app"
+      - "User wants to publish or share their agent's wrapped page"
     avoid-when:
       - "User wants analytics about cost or model usage (use cost tooling instead)"
+      - "Never activate app-builder or any page-building flow for wrapped stats"
 ---
 
 # Agent Wrapped
 
 Turn the agent's own workspace data into a wrapped-style recap. The plugin ships a collector that scans conversations and memory, plus a CLI and a model tool that expose it.
+
+## The flow
+
+Three steps, in order. Do not skip ahead and do not add steps.
+
+1. **Gather.** Call the `wrapped_stats` tool (or run the CLI). No `write_path` needed.
+2. **Present as data.** Show the stats directly in the chat as formatted text: conversations, days together, memories, swears, top topics, and the receipt. The chat message IS the presentation. **Do not build anything visual.** No apps, no app-builder, no standalone HTML pages, no dashboards, no dynamic pages, no card UIs of any kind.
+3. **Offer to publish.** Ask the user if they want their wrapped live at `agent-wrapped.com/<name>`. If yes, run the publish script (see "Publishing a share page" below) and hand back the live URL. The published page is the whole visual experience: cards, animations, share buttons. There is nothing for you to build.
+
+**HARD RULE: never build a UI for wrapped stats.** The only visual surface for a wrapped is the published agent-wrapped.com page. If the user asks for something visual, that IS the publish flow, so ask for consent and publish.
 
 ## What gets measured
 
@@ -39,7 +49,7 @@ Background and scheduled conversations (`meta.type !== "standard"`) are excluded
 
 ## Two ways to run it
 
-**1. The `wrapped_stats` tool (preferred).** Call it directly; pass `write_path` to also write the stats JSON somewhere (typically a cards app's `src/wrapped-data.json`). Pass `top_n` to change how many topics come back.
+**1. The `wrapped_stats` tool (preferred).** Call it directly. Pass `top_n` to change how many topics come back. `write_path` exists for exporting the JSON to a file but is not needed for the normal flow.
 
 **2. The CLI.** `node <plugin-dir>/bin/wrapped.js` with flags:
 
@@ -55,24 +65,15 @@ Background and scheduled conversations (`meta.type !== "standard"`) are excluded
 - **vellum** (default when a workspace is present): conversations/ + memory/concepts/
 - **claude**: Claude Code session history at `~/.claude/projects/*/*.jsonl`. Sessions map to conversations, first human prompt per session feeds topic analysis, memories count entries in the global `CLAUDE.md`. The tool accepts a `source` input too.
 
-## Building the cards experience
+## Presenting the stats
 
-The stats JSON is designed to feed a card-based share UI (one stat per card).
+Present the stats in chat as plain formatted text or a simple list. Format numbers with `toLocaleString()`. Suggested order: conversations, days together (with `firstConversation` as a "since" label), memories, swears, top topics, then the receipt (total tokens + LLM calls) as the finale.
 
-**IMPORTANT: Do NOT use the Vellum `app-builder` skill to build the cards UI.** The wrapped cards experience is a standalone static web page (HTML/CSS/JS), not a Vellum in-app artifact. Build it as a self-contained page that can be deployed to Vercel or served statically. No framework, no build step, no app-builder.
-
-Typical flow:
-
-1. Run `wrapped_stats` with `write_path` to write the stats JSON somewhere the page can fetch it.
-2. Build a standalone HTML page that fetches or embeds the JSON inline (a `<script type="application/json">` block or a sibling `.json` file fetched at runtime).
-3. Map stats to cards: conversations, days together (show `firstConversation` as "since" label), memories, swears, top topics list, the receipt as the finale card (total tokens + LLM calls).
-4. Deploy the page to Vercel using the `vercel-static-deploy` skill, or serve it locally for preview.
-
-Format numbers with `toLocaleString()` and derive date labels from `firstConversation` rather than hardcoding.
+Do not build a UI for this. The share page at agent-wrapped.com already renders the full card experience for published wrappeds.
 
 ## Publishing a share page
 
-Wrapped pages go live at `https://agent-wrapped.com/<name>`. Publishing uploads the stats JSON to the public GitHub repo, so **always ask the user for explicit consent first** — never publish on your own initiative.
+Wrapped pages go live at `https://agent-wrapped.com/<name>`. Publishing uploads the stats JSON to the public GitHub repo, so **always ask the user for explicit consent first**. Never publish on your own initiative.
 
 **Choosing the page slug (`--name`):** Use the **assistant's name**, not the user's name. This is the assistant's wrapped, so the URL should reflect who the assistant is. For example, if the assistant is named Ziggy and the user is Marina, use `--name ziggy`, not `--name marina`. If the slug is already taken, the server auto-increments (e.g. `ziggy-1`, `ziggy-2`) and returns the actual URL.
 

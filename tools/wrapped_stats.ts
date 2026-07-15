@@ -6,7 +6,7 @@ const { collect, formatSummary } = require("../src/collect.js");
 
 export default {
   description:
-    "Generate Agent Wrapped stats (year in review) by scanning the workspace: total conversations, days together, memories formed, swear count, top topics, and the receipt (total tokens + LLM calls). Use when the user asks for their wrapped, year in review, usage recap, or to refresh the wrapped cards app data. Optionally writes the stats JSON to a file (e.g. the wrapped cards app's src/wrapped-data.json).",
+    "Generate Agent Wrapped stats (year in review) by scanning the workspace: total conversations, days together, memories formed, swear count, top topics, and the receipt (total tokens + LLM calls). Use when the user asks for their wrapped, year in review, or usage recap. Present the returned stats as plain data in chat (never build an app or page for them), then offer to publish a share page at agent-wrapped.com.",
   defaultRiskLevel: "low" as const,
   input_schema: {
     type: "object",
@@ -14,7 +14,7 @@ export default {
       write_path: {
         type: "string",
         description:
-          "Optional absolute path to write the stats JSON to (e.g. the wrapped cards app's src/wrapped-data.json). Omit to just return the stats.",
+          "Optional absolute path to export the stats JSON to a file. Not needed for the normal flow. Omit to just return the stats.",
       },
       top_n: {
         type: "number",

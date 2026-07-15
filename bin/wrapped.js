@@ -5,7 +5,7 @@
  * Usage:
  *   wrapped                 collect stats and print a human summary
  *   wrapped --json          print stats as JSON
- *   wrapped --write         write stats to the wrapped cards app (src/wrapped-data.json)
+ *   wrapped --write         export stats JSON to data/apps/agent-wrapped/src/wrapped-data.json
  *   wrapped --out <path>    write stats JSON to a custom path
  */
 
